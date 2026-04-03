@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -30,8 +29,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
 .badge-hidden{display:none;}
 .subject-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
 .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.subject-name{font-size:13px;font-weight:600;color:#1a1a1a;}
-.time-input{width:72px;height:36px;border:1px solid #ddd;border-radius:8px;padding:0 8px;font-size:16px;text-align:center;background:#fff;color:#1a1a1a;flex-shrink:0;}
+.subject-name{font-size:13px;font-weight:600;color:#1a1a1a;width:42px;flex-shrink:0;}
+.time-input{flex:1;height:44px;border:1px solid #ddd;border-radius:8px;padding:0 8px;font-size:16px;text-align:center;background:#fff;color:#1a1a1a;}
 .time-input.error{border-color:#E24B4A;background:#fff5f5;}
 .unit{font-size:12px;color:#888;width:16px;flex-shrink:0;}
 .note-area{width:100%;height:64px;border:1px solid #ddd;border-radius:8px;padding:8px 10px;font-size:16px;resize:none;font-family:inherit;background:#fff;color:#1a1a1a;}
@@ -162,19 +161,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
   <p class="section-head" style="margin-top:24px;">更新履歴</p>
   <table class="history-table">
     <thead>
-      <tr>
-        <th>バージョン</th>
-        <th>日付</th>
-        <th>内容</th>
-      </tr>
+      <tr><th>バージョン</th><th>日付</th><th>内容</th></tr>
     </thead>
     <tbody>
       <!-- 新しい更新履歴はここに追加してください -->
-      <tr>
-        <td>v1.0</td>
-        <td>2025-04-03</td>
-        <td>初回リリース</td>
-      </tr>
+      <tr><td>v1.0</td><td>2025-04-03</td><td>初回リリース</td></tr>
     </tbody>
   </table>
 </div>
@@ -267,7 +258,7 @@ function init() {
   SUBJECTS.forEach((s, i) => {
     ti.innerHTML += `<div class="subject-row">
       <span class="dot" style="background:${s.color}"></span>
-      <span class="subject-name" style="width:${i===5?'42px':'36px'}">${s.name}</span>
+      <span class="subject-name">${s.name}</span>
       <input type="text" inputmode="numeric" pattern="[0-9]*"
         class="time-input" id="t${i}" placeholder="0"
         oninput="sanitizeTimeInput(this)" onblur="sanitizeTimeInput(this)">
@@ -305,14 +296,11 @@ function loadDateToForm() {
 
   const badge = document.getElementById('date-badge');
   if (isToday) {
-    badge.textContent = '今日';
-    badge.className = 'date-badge badge-today';
+    badge.textContent = '今日'; badge.className = 'date-badge badge-today';
   } else if (isYesterday) {
-    badge.textContent = '昨日';
-    badge.className = 'date-badge badge-yesterday';
+    badge.textContent = '昨日'; badge.className = 'date-badge badge-yesterday';
   } else {
-    badge.textContent = '';
-    badge.className = 'date-badge badge-hidden';
+    badge.textContent = ''; badge.className = 'date-badge badge-hidden';
   }
 
   document.getElementById('btn-next').disabled = isToday;
@@ -393,6 +381,35 @@ function saveProfile() {
 function changeMonth(d)    { statsMonth = new Date(statsMonth.getFullYear(), statsMonth.getMonth()+d, 1); renderStats(); }
 function changeCalMonth(d) { calMonth   = new Date(calMonth.getFullYear(),   calMonth.getMonth()+d,   1); renderCal();   }
 
+function calcStreak() {
+  // 今日から遡って現在継続中の連続日数を計算
+  let current = 0;
+  const d = todayDate();
+  while (logs[dateStr(d)]) {
+    current++;
+    d.setDate(d.getDate() - 1);
+  }
+  // 現在継続中があればそれを返す
+  if (current > 0) return current;
+  // 途切れている場合は過去全体の最長連続を返す
+  const keys = Object.keys(logs).sort();
+  if (keys.length === 0) return 0;
+  if (keys.length === 1) return 1;
+  let maxStreak = 1, streak = 1;
+  for (let i = 1; i < keys.length; i++) {
+    const prev = new Date(keys[i-1]);
+    const curr = new Date(keys[i]);
+    const diff = (curr - prev) / (1000 * 60 * 60 * 24);
+    if (diff === 1) {
+      streak++;
+      if (streak > maxStreak) maxStreak = streak;
+    } else {
+      streak = 1;
+    }
+  }
+  return maxStreak;
+}
+
 function renderStats() {
   const mk = monthKey(statsMonth);
   document.getElementById('month-title').textContent = statsMonth.getFullYear() + '年' + (statsMonth.getMonth()+1) + '月';
@@ -411,12 +428,6 @@ function renderStats() {
       <div class="bar-track"><div class="bar-fill" style="width:${Math.round(totals[i]/maxT*100)}%;background:${s.color}"></div></div>
       <span class="bar-val">${totals[i]}</span>
     </div>`).join('');
-}
-
-function calcStreak() {
-  let streak = 0, d = todayDate();
-  while (true) { if (!logs[dateStr(d)]) break; streak++; d.setDate(d.getDate()-1); }
-  return streak;
 }
 
 function renderCal() {
