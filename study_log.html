@@ -12,7 +12,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
 .tab{flex:1;padding:10px 0;font-size:13px;font-weight:500;text-align:center;cursor:pointer;color:#888;border-bottom:2px solid transparent;}
 .tab.active{color:#1a1a1a;border-bottom:2px solid #1D9E75;}
 .section{display:none;}.section.active{display:block;}
-.section-head{font-size:11px;font-weight:600;color:#888;letter-spacing:.06em;margin-bottom:8px;margin-top:14px;text-transform:uppercase;}
+.section-head{font-size:11px;font-weight:600;color:#888;letter-spacing:.06em;margin-bottom:8px;margin-top:14px;}
 .profile-info{background:#f0faf6;border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
 .avatar{width:38px;height:38px;border-radius:50%;background:#9FE1CB;color:#085041;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .profile-text{font-size:13px;font-weight:600;color:#1a1a1a;}
@@ -50,12 +50,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
 .day-cell{font-size:11px;padding:5px 2px;border-radius:4px;cursor:pointer;color:#888;}
 .day-cell.has-log{background:#9FE1CB;color:#085041;font-weight:600;}
 .day-cell.today{outline:2px solid #1D9E75;}
-.setting-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.setting-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
 .setting-label{font-size:13px;width:56px;color:#666;flex-shrink:0;}
 .text-input{flex:1;height:36px;border:1px solid #ddd;border-radius:8px;padding:0 10px;font-size:13px;font-family:inherit;background:#fff;color:#1a1a1a;}
-.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;}
-.status-ok{background:#1D9E75;}.status-ng{background:#E24B4A;}
-.info-box{font-size:12px;color:#888;line-height:1.7;padding:10px 12px;background:#f8f8f8;border-radius:8px;margin-top:8px;}
+.text-input.error{border-color:#E24B4A;}
+.field-hint{font-size:11px;margin-left:64px;margin-bottom:10px;color:#888;}
+.field-hint.ok{color:#0F6E56;}
+.field-hint.ng{color:#E24B4A;}
+.profile-status{border-radius:8px;padding:10px 14px;margin-top:14px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;}
+.profile-status.saved{background:#E1F5EE;color:#085041;}
+.profile-status.unsaved{background:#FCEBEB;color:#A32D2D;}
 .send-status{font-size:12px;color:#666;text-align:center;margin-top:6px;min-height:18px;}
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#085041;color:#fff;padding:10px 22px;border-radius:22px;font-size:13px;font-weight:500;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:99;}
 .toast.show{opacity:1;}
@@ -126,19 +130,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
   <p class="section-head">プロフィール（初回のみ設定）</p>
   <div class="setting-row">
     <span class="setting-label">HRNO</span>
-    <input type="text" class="text-input" id="set-hrno" placeholder="例：2301">
+    <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4"
+      class="text-input" id="set-hrno" placeholder="例：2301"
+      oninput="sanitizeHrno(this)" onblur="validateHrno(this)">
   </div>
+  <div class="field-hint" id="hrno-hint">半角数字4桁で入力してください</div>
   <div class="setting-row">
     <span class="setting-label">氏名</span>
     <input type="text" class="text-input" id="set-name" placeholder="例：山田 太郎">
   </div>
   <button class="btn-primary" onclick="saveProfile()">保存</button>
-  <p class="section-head" style="margin-top:20px;">送信先</p>
-  <div style="display:flex;align-items:center;font-size:13px;color:#666;">
-    <span class="status-dot" id="gas-dot"></span>
-    <span id="gas-status"></span>
+  <div class="profile-status unsaved" id="profile-status">
+    <span class="status-icon">—</span>
+    <span id="profile-status-text">プロフィールが未登録です</span>
   </div>
-  <p class="info-box">送信先のスプレッドシートは教師が設定済みです。</p>
 </div>
 </div>
 
@@ -173,6 +178,27 @@ function toHankakuInt(str) {
     .replace(/[０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
     .replace(/[^0-9]/g, '');
 }
+
+function sanitizeHrno(el) {
+  el.value = toHankakuInt(el.value).slice(0, 4);
+  el.classList.remove('error');
+  document.getElementById('hrno-hint').className = 'field-hint';
+  document.getElementById('hrno-hint').textContent = '半角数字4桁で入力してください';
+}
+
+function validateHrno(el) {
+  const v = el.value;
+  if (v === '' || v.length === 4) {
+    el.classList.remove('error');
+    document.getElementById('hrno-hint').className = 'field-hint' + (v.length === 4 ? ' ok' : '');
+    document.getElementById('hrno-hint').textContent = v.length === 4 ? 'OK' : '半角数字4桁で入力してください';
+  } else {
+    el.classList.add('error');
+    document.getElementById('hrno-hint').className = 'field-hint ng';
+    document.getElementById('hrno-hint').textContent = '4桁で入力してください（現在' + v.length + '桁）';
+  }
+}
+
 function sanitizeTimeInput(el) {
   const raw = toHankakuInt(el.value);
   el.value = raw;
@@ -180,17 +206,24 @@ function sanitizeTimeInput(el) {
   el.classList.toggle('error', raw !== '' && (n < 0 || n > 600));
 }
 
+function renderProfileStatus() {
+  const ok = profile.hrno.length === 4 && profile.name.trim() !== '';
+  const el = document.getElementById('profile-status');
+  el.className = 'profile-status ' + (ok ? 'saved' : 'unsaved');
+  el.querySelector('.status-icon').textContent = ok ? '✓' : '—';
+  document.getElementById('profile-status-text').textContent = ok
+    ? 'HRNO: ' + profile.hrno + '　氏名: ' + profile.name
+    : 'プロフィールが未登録です';
+}
+
 function init() {
-  const sl = localStorage.getItem('study_logs_v6');
-  const sp = localStorage.getItem('study_profile_v6');
+  const sl = localStorage.getItem('study_logs_v8');
+  const sp = localStorage.getItem('study_profile_v8');
   if (sl) logs = JSON.parse(sl);
   if (sp) profile = JSON.parse(sp);
   document.getElementById('set-hrno').value = profile.hrno || '';
   document.getElementById('set-name').value  = profile.name  || '';
-
-  const gasOk = GAS_URL.trim() !== '' && !GAS_URL.includes('ここに');
-  document.getElementById('gas-dot').className = 'status-dot ' + (gasOk ? 'status-ok' : 'status-ng');
-  document.getElementById('gas-status').textContent = gasOk ? '送信先が設定されています' : '送信先が未設定です（教師にご連絡ください）';
+  if (profile.hrno) validateHrno(document.getElementById('set-hrno'));
 
   currentDate = yesterday();
   statsMonth  = new Date(currentDate);
@@ -200,7 +233,7 @@ function init() {
   SUBJECTS.forEach((s, i) => {
     ti.innerHTML += `<div class="subject-row">
       <span class="dot" style="background:${s.color}"></span>
-      <span class="subject-name" style="width:${i===5?'46px':'36px'}">${s.name}</span>
+      <span class="subject-name" style="width:${i===5?'42px':'36px'}">${s.name}</span>
       <input type="text" inputmode="numeric" pattern="[0-9]*"
         class="time-input" id="t${i}" placeholder="0"
         oninput="sanitizeTimeInput(this)" onblur="sanitizeTimeInput(this)">
@@ -209,6 +242,7 @@ function init() {
   });
 
   renderProfile();
+  renderProfileStatus();
   loadDateToForm();
   renderStats();
   renderCal();
@@ -266,7 +300,7 @@ async function saveAndSend() {
   const k    = dateStr(currentDate);
   const note = document.getElementById('note').value;
   logs[k] = { times, note };
-  localStorage.setItem('study_logs_v6', JSON.stringify(logs));
+  localStorage.setItem('study_logs_v8', JSON.stringify(logs));
   loadDateToForm(); renderStats(); renderCal();
 
   const statusEl = document.getElementById('send-status');
@@ -294,10 +328,16 @@ async function saveAndSend() {
 }
 
 function saveProfile() {
-  profile.hrno = document.getElementById('set-hrno').value.trim();
-  profile.name = document.getElementById('set-name').value.trim();
-  localStorage.setItem('study_profile_v6', JSON.stringify(profile));
+  const hrnoEl  = document.getElementById('set-hrno');
+  const nameVal = document.getElementById('set-name').value.trim();
+  validateHrno(hrnoEl);
+  if (hrnoEl.value.length !== 4) { showToast('HRNOは4桁の半角数字で入力してください'); return; }
+  if (!nameVal) { showToast('氏名を入力してください'); return; }
+  profile.hrno = hrnoEl.value;
+  profile.name = nameVal;
+  localStorage.setItem('study_profile_v8', JSON.stringify(profile));
   renderProfile();
+  renderProfileStatus();
   showToast('プロフィールを保存しました');
 }
 
@@ -311,9 +351,9 @@ function renderStats() {
   const days    = entries.length;
   const totals  = SUBJECTS.map((_, i) => entries.reduce((s, [, v]) => s + (v.times[i] || 0), 0));
   const grand   = totals.reduce((a, b) => a + b, 0);
-  document.getElementById('s-days').textContent  = days;
-  document.getElementById('s-total').textContent = (grand / 60).toFixed(1);
-  document.getElementById('s-avg').textContent   = days ? Math.round(grand / days) : 0;
+  document.getElementById('s-days').textContent   = days;
+  document.getElementById('s-total').textContent  = (grand / 60).toFixed(1);
+  document.getElementById('s-avg').textContent    = days ? Math.round(grand / days) : 0;
   document.getElementById('s-streak').textContent = calcStreak();
   const maxT = Math.max(...totals, 1);
   document.getElementById('bar-chart').innerHTML = SUBJECTS.map((s, i) => `
