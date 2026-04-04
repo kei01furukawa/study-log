@@ -38,6 +38,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
 .btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
 .card{background:#f8f8f8;border-radius:12px;padding:1rem 1.25rem;margin-bottom:12px;}
 .card-title{font-size:13px;color:#888;margin-bottom:10px;}
+.streak-card{background:#f0faf6;border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+.streak-left{display:flex;flex-direction:column;gap:2px;}
+.streak-label{font-size:11px;font-weight:600;color:#0F6E56;letter-spacing:.05em;}
+.streak-sub{font-size:11px;color:#888;}
+.streak-num{font-size:36px;font-weight:600;color:#1D9E75;line-height:1;}
+.streak-unit{font-size:13px;color:#0F6E56;font-weight:500;}
 .month-select{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .month-select button{background:#fff;border:1px solid #ddd;border-radius:8px;padding:5px 12px;font-size:13px;cursor:pointer;color:#1a1a1a;}
 .month-title{font-size:14px;font-weight:600;color:#1a1a1a;}
@@ -46,9 +52,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
 .bar-track{flex:1;height:16px;background:#e8e8e8;border-radius:4px;overflow:hidden;}
 .bar-fill{height:100%;border-radius:4px;transition:width 0.4s;}
 .bar-val{font-size:12px;font-weight:600;width:36px;text-align:right;color:#1a1a1a;}
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
 .stat-card{background:#f8f8f8;border-radius:10px;padding:10px 12px;text-align:center;}
-.stat-num{font-size:24px;font-weight:600;color:#1a1a1a;}
+.stat-num{font-size:22px;font-weight:600;color:#1a1a1a;}
 .stat-lbl{font-size:11px;color:#888;margin-top:2px;}
 .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center;}
 .week-label{font-size:10px;color:#888;padding:2px 0;}
@@ -60,7 +66,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
 .text-input{flex:1;height:36px;border:1px solid #ddd;border-radius:8px;padding:0 10px;font-size:16px;font-family:inherit;background:#fff;color:#1a1a1a;}
 .text-input.error{border-color:#E24B4A;}
 .field-hint{font-size:11px;margin-left:64px;margin-bottom:10px;color:#888;}
-.field-hint.ok{color:#0F6E56;}
 .field-hint.ng{color:#E24B4A;}
 .profile-status{border-radius:8px;padding:10px 14px;margin-top:14px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;}
 .profile-status.saved{background:#E1F5EE;color:#085041;}
@@ -109,6 +114,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
 </div>
 
 <div id="stats" class="section">
+  <div class="streak-card">
+    <div class="streak-left">
+      <span class="streak-label">連続記録日数</span>
+      <span class="streak-sub">月をまたいで集計</span>
+    </div>
+    <div style="display:flex;align-items:baseline;gap:4px;">
+      <span class="streak-num" id="s-streak">0</span>
+      <span class="streak-unit">日</span>
+    </div>
+  </div>
   <div class="month-select">
     <button onclick="changeMonth(-1)">◀</button>
     <span class="month-title" id="month-title"></span>
@@ -118,7 +133,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
     <div class="stat-card"><div class="stat-num" id="s-days">0</div><div class="stat-lbl">記録日数</div></div>
     <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-lbl">総学習時間(h)</div></div>
     <div class="stat-card"><div class="stat-num" id="s-avg">0</div><div class="stat-lbl">平均時間/日(分)</div></div>
-    <div class="stat-card"><div class="stat-num" id="s-streak">0</div><div class="stat-lbl">連続記録日数</div></div>
   </div>
   <div class="card">
     <p class="card-title">教科別 学習時間（分計）</p>
@@ -157,7 +171,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
     <span class="status-icon">—</span>
     <span id="profile-status-text">プロフィールが未登録です</span>
   </div>
-
   <p class="section-head" style="margin-top:24px;">更新履歴</p>
   <table class="history-table">
     <thead>
@@ -197,6 +210,7 @@ function dateStr(d) { return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' +
 function todayDate() { const d = new Date(); d.setHours(0,0,0,0); return d; }
 function yesterdayDate() { const d = new Date(); d.setDate(d.getDate()-1); d.setHours(0,0,0,0); return d; }
 function monthKey(d) { return d.getFullYear() + '-' + pad(d.getMonth()+1); }
+function totalMinutes(l) { return l ? l.times.reduce((a,b) => a+b, 0) : 0; }
 
 function toHankakuInt(str) {
   return str
@@ -215,8 +229,8 @@ function validateHrno(el) {
   const v = el.value;
   if (v === '' || v.length === 4) {
     el.classList.remove('error');
-    document.getElementById('hrno-hint').className = 'field-hint' + (v.length === 4 ? ' ok' : '');
-    document.getElementById('hrno-hint').textContent = v.length === 4 ? 'OK' : '半角数字4桁で入力してください';
+    document.getElementById('hrno-hint').className = 'field-hint';
+    document.getElementById('hrno-hint').textContent = v.length === 4 ? '' : '半角数字4桁で入力してください';
   } else {
     el.classList.add('error');
     document.getElementById('hrno-hint').className = 'field-hint ng';
@@ -382,17 +396,19 @@ function changeMonth(d)    { statsMonth = new Date(statsMonth.getFullYear(), sta
 function changeCalMonth(d) { calMonth   = new Date(calMonth.getFullYear(),   calMonth.getMonth()+d,   1); renderCal();   }
 
 function calcStreak() {
-  // 今日から遡って現在継続中の連続日数を計算
+  function hasValidLog(k) { return logs[k] && totalMinutes(logs[k]) >= 1; }
+
+  // 今日から遡って現在継続中の連続日数
   let current = 0;
   const d = todayDate();
-  while (logs[dateStr(d)]) {
+  while (hasValidLog(dateStr(d))) {
     current++;
     d.setDate(d.getDate() - 1);
   }
-  // 現在継続中があればそれを返す
   if (current > 0) return current;
+
   // 途切れている場合は過去全体の最長連続を返す
-  const keys = Object.keys(logs).sort();
+  const keys = Object.keys(logs).filter(k => totalMinutes(logs[k]) >= 1).sort();
   if (keys.length === 0) return 0;
   if (keys.length === 1) return 1;
   let maxStreak = 1, streak = 1;
@@ -400,12 +416,8 @@ function calcStreak() {
     const prev = new Date(keys[i-1]);
     const curr = new Date(keys[i]);
     const diff = (curr - prev) / (1000 * 60 * 60 * 24);
-    if (diff === 1) {
-      streak++;
-      if (streak > maxStreak) maxStreak = streak;
-    } else {
-      streak = 1;
-    }
+    if (diff === 1) { streak++; if (streak > maxStreak) maxStreak = streak; }
+    else { streak = 1; }
   }
   return maxStreak;
 }
@@ -413,7 +425,7 @@ function calcStreak() {
 function renderStats() {
   const mk = monthKey(statsMonth);
   document.getElementById('month-title').textContent = statsMonth.getFullYear() + '年' + (statsMonth.getMonth()+1) + '月';
-  const entries = Object.entries(logs).filter(([k]) => k.startsWith(mk));
+  const entries = Object.entries(logs).filter(([k, v]) => k.startsWith(mk) && totalMinutes(v) >= 1);
   const days    = entries.length;
   const totals  = SUBJECTS.map((_, i) => entries.reduce((s, [, v]) => s + (v.times[i] || 0), 0));
   const grand   = totals.reduce((a, b) => a + b, 0);
@@ -439,8 +451,9 @@ function renderCal() {
   let cells = '';
   for (let i = 0; i < first.getDay(); i++) cells += `<div></div>`;
   for (let d = 1; d <= last.getDate(); d++) {
-    const k = calMonth.getFullYear() + '-' + pad(calMonth.getMonth()+1) + '-' + pad(d);
-    cells += `<div class="day-cell${logs[k]?' has-log':''}${k===td?' today':''}" onclick="showDayDetail('${k}')">${d}</div>`;
+    const k     = calMonth.getFullYear() + '-' + pad(calMonth.getMonth()+1) + '-' + pad(d);
+    const valid = logs[k] && totalMinutes(logs[k]) >= 1;
+    cells += `<div class="day-cell${valid?' has-log':''}${k===td?' today':''}" onclick="showDayDetail('${k}')">${d}</div>`;
   }
   document.getElementById('cal-grid').innerHTML = cells;
 }
@@ -449,7 +462,7 @@ function showDayDetail(k) {
   const l   = logs[k];
   const det = document.getElementById('day-detail');
   if (!l) { det.innerHTML = ''; return; }
-  const total = l.times.reduce((a, b) => a + b, 0);
+  const total = totalMinutes(l);
   det.innerHTML = `<div class="card" style="margin-top:12px;">
     <p class="card-title">${k}の記録（合計 ${total}分）</p>
     ${SUBJECTS.map((s, i) => l.times[i] ? `<div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid #eee;">
