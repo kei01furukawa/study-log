@@ -2,10 +2,11 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>学習記録</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
+html{touch-action:manipulation;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-serif;background:var(--bg);color:var(--text);transition:background 0.2s,color 0.2s;}
 
 :root{
@@ -44,6 +45,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
 }
 
 .app{max-width:480px;margin:0 auto;background:var(--bg);min-height:100vh;padding:1rem;}
+.app-header{font-size:11px;font-weight:600;color:var(--text-sub);letter-spacing:.05em;margin-bottom:10px;}
 .tab-bar{display:flex;border-bottom:1px solid var(--border-sub);margin-bottom:1.25rem;}
 .tab{flex:1;padding:10px 0;font-size:13px;font-weight:500;text-align:center;cursor:pointer;color:var(--text-sub);border-bottom:2px solid transparent;}
 .tab.active{color:var(--text);border-bottom:2px solid #1D9E75;}
@@ -124,6 +126,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
 </head>
 <body>
 <div class="app" id="app">
+  <div class="app-header">学習記録アプリ｜浜松南高校</div>
 <div class="tab-bar">
   <div class="tab active" onclick="switchTab('log')">記録する</div>
   <div class="tab" onclick="switchTab('stats')">統計</div>
@@ -181,7 +184,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
     <div id="bar-chart"></div>
   </div>
 
-  <!-- ★ Tips エリア： -->
+  <!-- ★ Tips エリア：-->
   <div class="tips-card">
     <div class="tips-label">Tips</div>
     <div class="tips-text">毎日勉強時間はしっかりと記録しましょう！</div>
@@ -245,11 +248,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
 <div class="toast" id="toast"></div>
 
 <script>
-/* =====================================================
-   ★ 
-   ===================================================== */
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbxF41OQklJVUKf4Im_G1MT857TrBAC3v-ujRdi0jzGjk3pWnRkzviFgtZ2v3KSQl3K5Rg/exec';
-/* ===================================================== */
 
 const SUBJECTS = [
   { name: '国語',   color: '#D4537E' },
@@ -270,7 +269,6 @@ function yesterdayDate() { const d = new Date(); d.setDate(d.getDate()-1); d.set
 function monthKey(d) { return d.getFullYear() + '-' + pad(d.getMonth()+1); }
 function totalMinutes(l) { return l ? l.times.reduce((a,b) => a+b, 0) : 0; }
 
-/* テーマ管理 */
 function applyTheme(theme) {
   const app = document.getElementById('app');
   if (theme === 'dark') {
@@ -445,13 +443,6 @@ async function saveAndSend() {
 
   const statusEl = document.getElementById('send-status');
   const btn      = document.getElementById('save-btn');
-  const gasOk    = GAS_URL.trim() !== '' && !GAS_URL.includes('ここに');
-
-  if (!gasOk) {
-    statusEl.textContent = '※ローカルに保存しました（送信先未設定）';
-    showToast('ローカルに保存しました');
-    return;
-  }
 
   btn.disabled = true; btn.textContent = '送信中…'; statusEl.textContent = '';
   try {
