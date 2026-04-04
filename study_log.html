@@ -3,25 +3,61 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>R8年度 学習記録</title>
+<title>学習記録</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-serif;background:#f5f5f5;color:#1a1a1a;}
-.app{max-width:480px;margin:0 auto;background:#fff;min-height:100vh;padding:1rem;}
-.tab-bar{display:flex;border-bottom:1px solid #e0e0e0;margin-bottom:1.25rem;}
-.tab{flex:1;padding:10px 0;font-size:13px;font-weight:500;text-align:center;cursor:pointer;color:#888;border-bottom:2px solid transparent;}
-.tab.active{color:#1a1a1a;border-bottom:2px solid #1D9E75;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-serif;background:var(--bg);color:var(--text);transition:background 0.2s,color 0.2s;}
+
+:root{
+  --bg:#fff;
+  --bg-sub:#f8f8f8;
+  --bg-green:#f0faf6;
+  --text:#1a1a1a;
+  --text-sub:#888;
+  --border:#ddd;
+  --border-sub:#e0e0e0;
+  --input-bg:#fff;
+  --streak-num:#1D9E75;
+  --streak-label:#0F6E56;
+  --streak-bg:#f0faf6;
+  --tips-bg:#fff8e7;
+  --tips-border:#f0d080;
+  --tips-text:#7a5c00;
+  --tips-label:#b8860b;
+}
+[data-theme="dark"]{
+  --bg:#1a1a1a;
+  --bg-sub:#2a2a2a;
+  --bg-green:#0d2e20;
+  --text:#f0f0f0;
+  --text-sub:#999;
+  --border:#444;
+  --border-sub:#333;
+  --input-bg:#2a2a2a;
+  --streak-num:#4ecb8d;
+  --streak-label:#4ecb8d;
+  --streak-bg:#0d2e20;
+  --tips-bg:#2a2510;
+  --tips-border:#7a6020;
+  --tips-text:#e0c060;
+  --tips-label:#f0d070;
+}
+
+.app{max-width:480px;margin:0 auto;background:var(--bg);min-height:100vh;padding:1rem;}
+.tab-bar{display:flex;border-bottom:1px solid var(--border-sub);margin-bottom:1.25rem;}
+.tab{flex:1;padding:10px 0;font-size:13px;font-weight:500;text-align:center;cursor:pointer;color:var(--text-sub);border-bottom:2px solid transparent;}
+.tab.active{color:var(--text);border-bottom:2px solid #1D9E75;}
 .section{display:none;}.section.active{display:block;}
-.section-head{font-size:11px;font-weight:600;color:#888;letter-spacing:.06em;margin-bottom:8px;margin-top:14px;}
-.profile-info{background:#f0faf6;border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.section-head{font-size:11px;font-weight:600;color:var(--text-sub);letter-spacing:.06em;margin-bottom:8px;margin-top:14px;}
+.profile-info{background:var(--bg-green);border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
 .avatar{width:38px;height:38px;border-radius:50%;background:#9FE1CB;color:#085041;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.profile-text{font-size:13px;font-weight:600;color:#1a1a1a;}
-.profile-sub{font-size:11px;color:#888;}
+.profile-text{font-size:13px;font-weight:600;color:var(--text);}
+.profile-sub{font-size:11px;color:var(--text-sub);}
 .date-nav{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
-.date-nav button{background:#fff;border:1px solid #ddd;border-radius:8px;padding:5px 12px;font-size:13px;cursor:pointer;color:#1a1a1a;}
+.date-nav button{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:13px;cursor:pointer;color:var(--text);}
 .date-nav button:disabled{opacity:0.3;cursor:not-allowed;}
 .date-center{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;}
-.date-display{font-size:13px;font-weight:600;color:#1a1a1a;text-align:center;}
+.date-display{font-size:13px;font-weight:600;color:var(--text);text-align:center;}
 .date-display.has-log{color:#0F6E56;}
 .date-badge{display:inline-block;font-size:11px;font-weight:500;padding:2px 10px;border-radius:20px;line-height:1.6;}
 .badge-today{background:#1D9E75;color:#fff;}
@@ -29,59 +65,65 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
 .badge-hidden{display:none;}
 .subject-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
 .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.subject-name{font-size:13px;font-weight:600;color:#1a1a1a;width:42px;flex-shrink:0;}
-.time-input{flex:1;height:44px;border:1px solid #ddd;border-radius:8px;padding:0 8px;font-size:16px;text-align:center;background:#fff;color:#1a1a1a;}
+.subject-name{font-size:13px;font-weight:600;color:var(--text);width:42px;flex-shrink:0;}
+.time-input{flex:1;height:44px;border:1px solid var(--border);border-radius:8px;padding:0 8px;font-size:16px;text-align:center;background:var(--input-bg);color:var(--text);}
 .time-input.error{border-color:#E24B4A;background:#fff5f5;}
-.unit{font-size:12px;color:#888;width:16px;flex-shrink:0;}
-.note-area{width:100%;height:64px;border:1px solid #ddd;border-radius:8px;padding:8px 10px;font-size:16px;resize:none;font-family:inherit;background:#fff;color:#1a1a1a;}
+.unit{font-size:12px;color:var(--text-sub);width:16px;flex-shrink:0;}
+.note-area{width:100%;height:64px;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:16px;resize:none;font-family:inherit;background:var(--input-bg);color:var(--text);}
 .btn-primary{width:100%;padding:13px;background:#1D9E75;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;margin-top:14px;}
 .btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
-.card{background:#f8f8f8;border-radius:12px;padding:1rem 1.25rem;margin-bottom:12px;}
-.card-title{font-size:13px;color:#888;margin-bottom:10px;}
-.streak-card{background:#f0faf6;border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+.card{background:var(--bg-sub);border-radius:12px;padding:1rem 1.25rem;margin-bottom:12px;}
+.card-title{font-size:13px;color:var(--text-sub);margin-bottom:10px;}
+.streak-card{background:var(--streak-bg);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
 .streak-left{display:flex;flex-direction:column;gap:2px;}
-.streak-label{font-size:11px;font-weight:600;color:#0F6E56;letter-spacing:.05em;}
-.streak-sub{font-size:11px;color:#888;}
-.streak-num{font-size:36px;font-weight:600;color:#1D9E75;line-height:1;}
-.streak-unit{font-size:13px;color:#0F6E56;font-weight:500;}
+.streak-label{font-size:11px;font-weight:600;color:var(--streak-label);letter-spacing:.05em;}
+.streak-sub{font-size:11px;color:var(--text-sub);}
+.streak-num{font-size:36px;font-weight:600;color:var(--streak-num);line-height:1;}
+.streak-unit{font-size:13px;color:var(--streak-label);font-weight:500;}
 .month-select{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.month-select button{background:#fff;border:1px solid #ddd;border-radius:8px;padding:5px 12px;font-size:13px;cursor:pointer;color:#1a1a1a;}
-.month-title{font-size:14px;font-weight:600;color:#1a1a1a;}
+.month-select button{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:13px;cursor:pointer;color:var(--text);}
+.month-title{font-size:14px;font-weight:600;color:var(--text);}
 .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-.bar-label{font-size:12px;width:42px;color:#666;}
-.bar-track{flex:1;height:16px;background:#e8e8e8;border-radius:4px;overflow:hidden;}
+.bar-label{font-size:12px;width:42px;color:var(--text-sub);}
+.bar-track{flex:1;height:16px;background:var(--border-sub);border-radius:4px;overflow:hidden;}
 .bar-fill{height:100%;border-radius:4px;transition:width 0.4s;}
-.bar-val{font-size:12px;font-weight:600;width:36px;text-align:right;color:#1a1a1a;}
+.bar-val{font-size:12px;font-weight:600;width:36px;text-align:right;color:var(--text);}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
-.stat-card{background:#f8f8f8;border-radius:10px;padding:10px 12px;text-align:center;}
-.stat-num{font-size:22px;font-weight:600;color:#1a1a1a;}
-.stat-lbl{font-size:11px;color:#888;margin-top:2px;}
+.stat-card{background:var(--bg-sub);border-radius:10px;padding:10px 12px;text-align:center;}
+.stat-num{font-size:22px;font-weight:600;color:var(--text);}
+.stat-lbl{font-size:11px;color:var(--text-sub);margin-top:2px;}
+.tips-card{background:var(--tips-bg);border:1px solid var(--tips-border);border-radius:12px;padding:14px 16px;margin-top:12px;}
+.tips-label{font-size:11px;font-weight:600;color:var(--tips-label);letter-spacing:.05em;margin-bottom:6px;}
+.tips-text{font-size:13px;color:var(--tips-text);line-height:1.7;}
 .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center;}
-.week-label{font-size:10px;color:#888;padding:2px 0;}
-.day-cell{font-size:11px;padding:5px 2px;border-radius:4px;cursor:pointer;color:#888;}
+.week-label{font-size:10px;color:var(--text-sub);padding:2px 0;}
+.day-cell{font-size:11px;padding:5px 2px;border-radius:4px;cursor:pointer;color:var(--text-sub);}
 .day-cell.has-log{background:#9FE1CB;color:#085041;font-weight:600;}
 .day-cell.today{outline:2px solid #1D9E75;}
 .setting-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
-.setting-label{font-size:13px;width:56px;color:#666;flex-shrink:0;}
-.text-input{flex:1;height:36px;border:1px solid #ddd;border-radius:8px;padding:0 10px;font-size:16px;font-family:inherit;background:#fff;color:#1a1a1a;}
+.setting-label{font-size:13px;width:56px;color:var(--text-sub);flex-shrink:0;}
+.text-input{flex:1;height:36px;border:1px solid var(--border);border-radius:8px;padding:0 10px;font-size:16px;font-family:inherit;background:var(--input-bg);color:var(--text);}
 .text-input.error{border-color:#E24B4A;}
-.field-hint{font-size:11px;margin-left:64px;margin-bottom:10px;color:#888;}
+.field-hint{font-size:11px;margin-left:64px;margin-bottom:10px;color:var(--text-sub);}
 .field-hint.ng{color:#E24B4A;}
 .profile-status{border-radius:8px;padding:10px 14px;margin-top:14px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;}
 .profile-status.saved{background:#E1F5EE;color:#085041;}
 .profile-status.unsaved{background:#FCEBEB;color:#A32D2D;}
+.theme-selector{display:flex;gap:8px;margin-top:8px;}
+.theme-btn{flex:1;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer;background:var(--bg-sub);color:var(--text);text-align:center;}
+.theme-btn.active{border-color:#1D9E75;color:#1D9E75;font-weight:600;}
 .history-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px;}
-.history-table th{text-align:left;color:#888;font-weight:600;padding:4px 6px;border-bottom:1px solid #e0e0e0;}
-.history-table td{padding:6px 6px;border-bottom:1px solid #f0f0f0;color:#1a1a1a;vertical-align:top;}
+.history-table th{text-align:left;color:var(--text-sub);font-weight:600;padding:4px 6px;border-bottom:1px solid var(--border-sub);}
+.history-table td{padding:6px 6px;border-bottom:1px solid var(--border-sub);color:var(--text);vertical-align:top;}
 .history-table td:first-child{color:#1D9E75;font-weight:600;white-space:nowrap;}
-.history-table td:nth-child(2){color:#888;white-space:nowrap;}
-.send-status{font-size:12px;color:#666;text-align:center;margin-top:6px;min-height:18px;}
+.history-table td:nth-child(2){color:var(--text-sub);white-space:nowrap;}
+.send-status{font-size:12px;color:var(--text-sub);text-align:center;margin-top:6px;min-height:18px;}
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#085041;color:#fff;padding:10px 22px;border-radius:22px;font-size:13px;font-weight:500;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:99;}
 .toast.show{opacity:1;}
 </style>
 </head>
 <body>
-<div class="app">
+<div class="app" id="app">
 <div class="tab-bar">
   <div class="tab active" onclick="switchTab('log')">記録する</div>
   <div class="tab" onclick="switchTab('stats')">統計</div>
@@ -138,6 +180,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
     <p class="card-title">教科別 学習時間（分計）</p>
     <div id="bar-chart"></div>
   </div>
+
+  <!-- ★ Tips エリア： -->
+  <div class="tips-card">
+    <div class="tips-label">Tips</div>
+    <div class="tips-text">毎日勉強時間はしっかりと記録しましょう！</div>
+  </div>
+  <!-- ★ Tips エリア ここまで -->
 </div>
 
 <div id="calendar" class="section">
@@ -171,13 +220,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
     <span class="status-icon">—</span>
     <span id="profile-status-text">プロフィールが未登録です</span>
   </div>
+
+  <p class="section-head" style="margin-top:20px;">表示モード</p>
+  <div class="theme-selector">
+    <div class="theme-btn" id="theme-light" onclick="setTheme('light')">ライト</div>
+    <div class="theme-btn" id="theme-dark" onclick="setTheme('dark')">ダーク</div>
+    <div class="theme-btn" id="theme-system" onclick="setTheme('system')">システム</div>
+  </div>
+
   <p class="section-head" style="margin-top:24px;">更新履歴</p>
   <table class="history-table">
     <thead>
       <tr><th>バージョン</th><th>日付</th><th>内容</th></tr>
     </thead>
     <tbody>
-      <!-- 新しい更新履歴はここに追加してください -->
+      <!-- 新しい更新履歴はここ -->
+      <tr><td>v1.1</td><td>2026-04-05</td><td>ダークモード追加・不具合修正およびパフォーマンスの改善</td></tr>
       <tr><td>v1.0</td><td>2025-04-03</td><td>初回リリース</td></tr>
     </tbody>
   </table>
@@ -188,7 +246,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
 
 <script>
 /* =====================================================
-   ★ ここだけ変更
+   ★ 
    ===================================================== */
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbxF41OQklJVUKf4Im_G1MT857TrBAC3v-ujRdi0jzGjk3pWnRkzviFgtZ2v3KSQl3K5Rg/exec';
 /* ===================================================== */
@@ -211,6 +269,36 @@ function todayDate() { const d = new Date(); d.setHours(0,0,0,0); return d; }
 function yesterdayDate() { const d = new Date(); d.setDate(d.getDate()-1); d.setHours(0,0,0,0); return d; }
 function monthKey(d) { return d.getFullYear() + '-' + pad(d.getMonth()+1); }
 function totalMinutes(l) { return l ? l.times.reduce((a,b) => a+b, 0) : 0; }
+
+/* テーマ管理 */
+function applyTheme(theme) {
+  const app = document.getElementById('app');
+  if (theme === 'dark') {
+    app.setAttribute('data-theme', 'dark');
+  } else if (theme === 'light') {
+    app.removeAttribute('data-theme');
+  } else {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (prefersDark) app.setAttribute('data-theme', 'dark');
+    else app.removeAttribute('data-theme');
+  }
+  document.querySelectorAll('.theme-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('theme-' + theme).classList.add('active');
+}
+
+function setTheme(theme) {
+  localStorage.setItem('study_theme_v8', theme);
+  applyTheme(theme);
+}
+
+function initTheme() {
+  const saved = localStorage.getItem('study_theme_v8') || 'system';
+  applyTheme(saved);
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    const current = localStorage.getItem('study_theme_v8') || 'system';
+    if (current === 'system') applyTheme('system');
+  });
+}
 
 function toHankakuInt(str) {
   return str
@@ -264,6 +352,7 @@ function init() {
   document.getElementById('set-name').value  = profile.name  || '';
   if (profile.hrno) validateHrno(document.getElementById('set-hrno'));
 
+  initTheme();
   currentDate = todayDate();
   statsMonth  = new Date(currentDate);
   calMonth    = new Date(currentDate);
@@ -397,17 +486,10 @@ function changeCalMonth(d) { calMonth   = new Date(calMonth.getFullYear(),   cal
 
 function calcStreak() {
   function hasValidLog(k) { return logs[k] && totalMinutes(logs[k]) >= 1; }
-
-  // 今日から遡って現在継続中の連続日数
   let current = 0;
   const d = todayDate();
-  while (hasValidLog(dateStr(d))) {
-    current++;
-    d.setDate(d.getDate() - 1);
-  }
+  while (hasValidLog(dateStr(d))) { current++; d.setDate(d.getDate()-1); }
   if (current > 0) return current;
-
-  // 途切れている場合は過去全体の最長連続を返す
   const keys = Object.keys(logs).filter(k => totalMinutes(logs[k]) >= 1).sort();
   if (keys.length === 0) return 0;
   if (keys.length === 1) return 1;
@@ -465,9 +547,9 @@ function showDayDetail(k) {
   const total = totalMinutes(l);
   det.innerHTML = `<div class="card" style="margin-top:12px;">
     <p class="card-title">${k}の記録（合計 ${total}分）</p>
-    ${SUBJECTS.map((s, i) => l.times[i] ? `<div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid #eee;">
+    ${SUBJECTS.map((s, i) => l.times[i] ? `<div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--border-sub);">
       <span style="color:${s.color};font-weight:600;">${s.name}</span><span>${l.times[i]}分</span></div>` : '').join('')}
-    ${l.note ? `<p style="font-size:12px;color:#888;margin-top:8px;">${l.note}</p>` : ''}
+    ${l.note ? `<p style="font-size:12px;color:var(--text-sub);margin-top:8px;">${l.note}</p>` : ''}
   </div>`;
 }
 
