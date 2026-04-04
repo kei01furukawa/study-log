@@ -8,42 +8,20 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html{touch-action:manipulation;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-serif;background:var(--bg);color:var(--text);transition:background 0.2s,color 0.2s;}
-
 :root{
-  --bg:#fff;
-  --bg-sub:#f8f8f8;
-  --bg-green:#f0faf6;
-  --text:#1a1a1a;
-  --text-sub:#888;
-  --border:#ddd;
-  --border-sub:#e0e0e0;
-  --input-bg:#fff;
-  --streak-num:#1D9E75;
-  --streak-label:#0F6E56;
-  --streak-bg:#f0faf6;
-  --tips-bg:#fff8e7;
-  --tips-border:#f0d080;
-  --tips-text:#7a5c00;
-  --tips-label:#b8860b;
+  --bg:#fff;--bg-sub:#f8f8f8;--bg-green:#f0faf6;
+  --text:#1a1a1a;--text-sub:#888;
+  --border:#ddd;--border-sub:#e0e0e0;--input-bg:#fff;
+  --streak-num:#1D9E75;--streak-label:#0F6E56;--streak-bg:#f0faf6;
+  --tips-bg:#fff8e7;--tips-border:#f0d080;--tips-text:#7a5c00;--tips-label:#b8860b;
 }
 [data-theme="dark"]{
-  --bg:#1a1a1a;
-  --bg-sub:#2a2a2a;
-  --bg-green:#0d2e20;
-  --text:#f0f0f0;
-  --text-sub:#999;
-  --border:#444;
-  --border-sub:#333;
-  --input-bg:#2a2a2a;
-  --streak-num:#4ecb8d;
-  --streak-label:#4ecb8d;
-  --streak-bg:#0d2e20;
-  --tips-bg:#2a2510;
-  --tips-border:#7a6020;
-  --tips-text:#e0c060;
-  --tips-label:#f0d070;
+  --bg:#1a1a1a;--bg-sub:#2a2a2a;--bg-green:#0d2e20;
+  --text:#f0f0f0;--text-sub:#999;
+  --border:#444;--border-sub:#333;--input-bg:#2a2a2a;
+  --streak-num:#4ecb8d;--streak-label:#4ecb8d;--streak-bg:#0d2e20;
+  --tips-bg:#2a2510;--tips-border:#7a6020;--tips-text:#e0c060;--tips-label:#f0d070;
 }
-
 .app{max-width:480px;margin:0 auto;background:var(--bg);min-height:100vh;padding:1rem;}
 .app-header{font-size:11px;font-weight:600;color:var(--text-sub);letter-spacing:.05em;margin-bottom:10px;}
 .tab-bar{display:flex;border-bottom:1px solid var(--border-sub);margin-bottom:1.25rem;}
@@ -103,10 +81,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
 .day-cell.has-log{background:#9FE1CB;color:#085041;font-weight:600;}
 .day-cell.today{outline:2px solid #1D9E75;}
 .setting-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
-.setting-label{font-size:13px;width:56px;color:var(--text-sub);flex-shrink:0;}
+.setting-label{font-size:13px;width:72px;color:var(--text-sub);flex-shrink:0;}
 .text-input{flex:1;height:36px;border:1px solid var(--border);border-radius:8px;padding:0 10px;font-size:16px;font-family:inherit;background:var(--input-bg);color:var(--text);}
 .text-input.error{border-color:#E24B4A;}
-.field-hint{font-size:11px;margin-left:64px;margin-bottom:10px;color:var(--text-sub);}
+.field-hint{font-size:11px;margin-left:80px;margin-bottom:10px;color:var(--text-sub);}
 .field-hint.ng{color:#E24B4A;}
 .profile-status{border-radius:8px;padding:10px 14px;margin-top:14px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;}
 .profile-status.saved{background:#E1F5EE;color:#085041;}
@@ -118,7 +96,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
 .theme-btn{flex:1;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer;background:var(--bg-sub);color:var(--text);text-align:center;}
 .theme-btn.active{border-color:#1D9E75;color:#1D9E75;font-weight:600;}
 .history-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px;}
-.history-table th{text-align:left;color:var(--text-sub);font-weight:600;padding:4px 6px;border-bottom:1px solid var(--border-sub);}
+.history-table th{text-align:left;color:var(--text-sub);font-weight:600;padding:4px 6px;border-bottom:1px solid var(--border-sub);white-space:nowrap;}
 .history-table td{padding:6px 6px;border-bottom:1px solid var(--border-sub);color:var(--text);vertical-align:top;}
 .history-table td:first-child{color:#1D9E75;font-weight:600;white-space:nowrap;}
 .history-table td:nth-child(2){color:var(--text-sub);white-space:nowrap;}
@@ -129,7 +107,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
 </head>
 <body>
 <div class="app" id="app">
-  <div class="app-header">学習記録アプリ｜浜松南高校</div>
+<div class="app-header">学習記録アプリ｜浜松南高校</div>
 <div class="tab-bar">
   <div class="tab active" onclick="switchTab('log')">記録する</div>
   <div class="tab" onclick="switchTab('stats')">統計</div>
@@ -186,8 +164,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
     <p class="card-title">教科別 学習時間（分計）</p>
     <div id="bar-chart"></div>
   </div>
-
-  <!-- ★ Tips エリア： -->
+  <!-- ★ Tips エリア：-->
   <div class="tips-card">
     <div class="tips-label">Tips</div>
     <div class="tips-text">毎日勉強時間はしっかりと記録しましょう！</div>
@@ -222,12 +199,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
     <input type="text" class="text-input" id="set-name" placeholder="例：山田 太郎">
   </div>
   <div class="setting-row">
-    <span class="setting-label">生年月日</span>
+    <span class="setting-label">パスコード</span>
     <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4"
-      class="text-input" id="set-bday" placeholder="例：0415（月日4桁）"
+      class="text-input" id="set-bday" placeholder="例：0415"
       oninput="sanitizeBday(this)" onblur="validateBday(this)">
   </div>
-  <div class="field-hint" id="bday-hint">月日を4桁で入力してください（例：4月15日→0415）</div>
+  <div class="field-hint" id="bday-hint">誕生日の月日4桁を入力してください（例：4月15日→0415）</div>
   <button class="btn-primary" onclick="saveProfile()">保存</button>
   <div class="profile-status unsaved" id="profile-status">
     <span class="status-icon">—</span>
@@ -245,11 +222,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
   <p class="section-head" style="margin-top:24px;">更新履歴</p>
   <table class="history-table">
     <thead>
-      <tr><th>バージョン</th><th>日付</th><th>内容</th></tr>
+      <tr><th>Ver.</th><th>日付</th><th>内容</th></tr>
     </thead>
     <tbody>
       <!-- 新しい更新履歴はここ -->
-      <tr><td>v1.2</td><td>2025-04-05</td><td>同期仕様を追加、HRNOと誕生日で認証しデータを複数端末で同期可</td></tr>
+      <tr><td>v1.2</td><td>2026-04-05</td><td>同期機能を追加、HRNOとパスコードで認証しデータを複数端末で同期可</td></tr>
       <tr><td>v1.1</td><td>2026-04-05</td><td>ダークモード追加・不具合修正およびパフォーマンスの改善</td></tr>
       <tr><td>v1.0</td><td>2025-04-03</td><td>初回リリース</td></tr>
     </tbody>
@@ -264,182 +241,164 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbxF41OQklJVUKf4Im_G1MT8
 const FB_URL  = 'https://study-log-58f8e-default-rtdb.firebaseio.com/students';
 
 const SUBJECTS = [
-  { name: '国語',   color: '#D4537E' },
-  { name: '数学',   color: '#378ADD' },
-  { name: '英語',   color: '#1D9E75' },
-  { name: '理科',   color: '#EF9F27' },
-  { name: '社会',   color: '#7F77DD' },
-  { name: 'その他', color: '#888780' }
+  {name:'国語',  color:'#D4537E'},
+  {name:'数学',  color:'#378ADD'},
+  {name:'英語',  color:'#1D9E75'},
+  {name:'理科',  color:'#EF9F27'},
+  {name:'社会',  color:'#7F77DD'},
+  {name:'その他',color:'#888780'}
 ];
 const DOW = ['日','月','火','水','木','金','土'];
-let logs = {}, profile = { hrno: '', name: '', bday: '' };
+let logs = {}, profile = {hrno:'',name:'',bday:''};
 let currentDate, statsMonth, calMonth;
 
-function pad(n) { return String(n).padStart(2, '0'); }
-function dateStr(d) { return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()); }
-function todayDate() { const d = new Date(); d.setHours(0,0,0,0); return d; }
-function yesterdayDate() { const d = new Date(); d.setDate(d.getDate()-1); d.setHours(0,0,0,0); return d; }
-function monthKey(d) { return d.getFullYear() + '-' + pad(d.getMonth()+1); }
-function totalMinutes(l) { return l ? l.times.reduce((a,b) => a+b, 0) : 0; }
-function fbKey() { return profile.hrno + '_' + profile.bday; }
-function canSync() { return profile.hrno.length === 4 && profile.bday.length === 4; }
+function pad(n){return String(n).padStart(2,'0');}
+function dateStr(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function todayDate(){const d=new Date();d.setHours(0,0,0,0);return d;}
+function yesterdayDate(){const d=new Date();d.setDate(d.getDate()-1);d.setHours(0,0,0,0);return d;}
+function monthKey(d){return d.getFullYear()+'-'+pad(d.getMonth()+1);}
+function totalMinutes(l){return l?l.times.reduce((a,b)=>a+b,0):0;}
+function fbKey(){return profile.hrno+'_'+profile.bday;}
+function canSync(){return profile.hrno.length===4&&profile.bday.length===4;}
 
-/* Firebase REST API */
-async function fbGet() {
-  try {
-    const res = await fetch(FB_URL + '/' + fbKey() + '.json');
-    const data = await res.json();
+async function fbGet(){
+  try{
+    const res=await fetch(FB_URL+'/'+fbKey()+'.json');
+    const data=await res.json();
     return data;
-  } catch(e) { return null; }
+  }catch(e){return null;}
 }
 
-async function fbSet(data) {
-  try {
-    await fetch(FB_URL + '/' + fbKey() + '.json', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+async function fbSet(data){
+  try{
+    await fetch(FB_URL+'/'+fbKey()+'.json',{
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data)
     });
     return true;
-  } catch(e) { return false; }
+  }catch(e){return false;}
 }
 
-/* 起動時にFirebaseからデータを取得 */
-async function syncFromFirebase() {
-  if (!canSync()) {
-    document.getElementById('sync-status').textContent = '同期：HRNO・生年月日を設定してください';
-    document.getElementById('sync-status').className = 'sync-status';
+async function syncFromFirebase(){
+  const statusEl=document.getElementById('sync-status');
+  if(!canSync()){
+    statusEl.textContent='同期：HRNO・パスコードを設定してください';
+    statusEl.className='sync-status';
     return;
   }
-  document.getElementById('sync-status').textContent = '同期中…';
-  document.getElementById('sync-status').className = 'sync-status';
-  const data = await fbGet();
-  if (data && typeof data === 'object') {
-    logs = data;
-    localStorage.setItem('study_logs_v8', JSON.stringify(logs));
+  statusEl.textContent='同期中…';
+  statusEl.className='sync-status';
+  const data=await fbGet();
+  if(data&&typeof data==='object'){
+    logs=data;
+    localStorage.setItem('study_logs_v8',JSON.stringify(logs));
     loadDateToForm();
     renderStats();
     renderCal();
-    document.getElementById('sync-status').textContent = '同期済み ✓';
-    document.getElementById('sync-status').className = 'sync-status ok';
-  } else {
-    document.getElementById('sync-status').textContent = '同期：クラウドにデータがありません（初回）';
-    document.getElementById('sync-status').className = 'sync-status';
+    statusEl.textContent='同期済み ✓';
+    statusEl.className='sync-status ok';
+  }else{
+    statusEl.textContent='同期：クラウドにデータがありません（初回）';
+    statusEl.className='sync-status';
   }
 }
 
-/* テーマ管理 */
-function applyTheme(theme) {
-  const app = document.getElementById('app');
-  if (theme === 'dark') {
-    app.setAttribute('data-theme', 'dark');
-  } else if (theme === 'light') {
-    app.removeAttribute('data-theme');
-  } else {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (prefersDark) app.setAttribute('data-theme', 'dark');
+function applyTheme(theme){
+  const app=document.getElementById('app');
+  if(theme==='dark'){app.setAttribute('data-theme','dark');}
+  else if(theme==='light'){app.removeAttribute('data-theme');}
+  else{
+    const prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if(prefersDark)app.setAttribute('data-theme','dark');
     else app.removeAttribute('data-theme');
   }
-  document.querySelectorAll('.theme-btn').forEach(el => el.classList.remove('active'));
-  document.getElementById('theme-' + theme).classList.add('active');
+  document.querySelectorAll('.theme-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('theme-'+theme).classList.add('active');
 }
-
-function setTheme(theme) {
-  localStorage.setItem('study_theme_v8', theme);
-  applyTheme(theme);
-}
-
-function initTheme() {
-  const saved = localStorage.getItem('study_theme_v8') || 'system';
+function setTheme(theme){localStorage.setItem('study_theme_v8',theme);applyTheme(theme);}
+function initTheme(){
+  const saved=localStorage.getItem('study_theme_v8')||'system';
   applyTheme(saved);
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-    const current = localStorage.getItem('study_theme_v8') || 'system';
-    if (current === 'system') applyTheme('system');
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{
+    const current=localStorage.getItem('study_theme_v8')||'system';
+    if(current==='system')applyTheme('system');
   });
 }
 
-function toHankakuInt(str) {
-  return str
-    .replace(/[０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
-    .replace(/[^0-9]/g, '');
+function toHankakuInt(str){
+  return str.replace(/[０-９]/g,s=>String.fromCharCode(s.charCodeAt(0)-0xFEE0)).replace(/[^0-9]/g,'');
 }
-
-function sanitizeHrno(el) {
-  el.value = toHankakuInt(el.value).slice(0, 4);
+function sanitizeHrno(el){
+  el.value=toHankakuInt(el.value).slice(0,4);
   el.classList.remove('error');
-  document.getElementById('hrno-hint').className = 'field-hint';
-  document.getElementById('hrno-hint').textContent = '半角数字4桁で入力してください';
+  document.getElementById('hrno-hint').className='field-hint';
+  document.getElementById('hrno-hint').textContent='半角数字4桁で入力してください';
 }
-
-function validateHrno(el) {
-  const v = el.value;
-  if (v === '' || v.length === 4) {
+function validateHrno(el){
+  const v=el.value;
+  if(v===''||v.length===4){
     el.classList.remove('error');
-    document.getElementById('hrno-hint').className = 'field-hint';
-    document.getElementById('hrno-hint').textContent = v.length === 4 ? '' : '半角数字4桁で入力してください';
-  } else {
+    document.getElementById('hrno-hint').className='field-hint';
+    document.getElementById('hrno-hint').textContent=v.length===4?'':'半角数字4桁で入力してください';
+  }else{
     el.classList.add('error');
-    document.getElementById('hrno-hint').className = 'field-hint ng';
-    document.getElementById('hrno-hint').textContent = '4桁で入力してください（現在' + v.length + '桁）';
+    document.getElementById('hrno-hint').className='field-hint ng';
+    document.getElementById('hrno-hint').textContent='4桁で入力してください（現在'+v.length+'桁）';
   }
 }
-
-function sanitizeBday(el) {
-  el.value = toHankakuInt(el.value).slice(0, 4);
+function sanitizeBday(el){
+  el.value=toHankakuInt(el.value).slice(0,4);
   el.classList.remove('error');
-  document.getElementById('bday-hint').className = 'field-hint';
-  document.getElementById('bday-hint').textContent = '月日を4桁で入力してください（例：4月15日→0415）';
+  document.getElementById('bday-hint').className='field-hint';
+  document.getElementById('bday-hint').textContent='誕生日の月日4桁を入力してください（例：4月15日→0415）';
 }
-
-function validateBday(el) {
-  const v = el.value;
-  if (v === '' || v.length === 4) {
+function validateBday(el){
+  const v=el.value;
+  if(v===''||v.length===4){
     el.classList.remove('error');
-    document.getElementById('bday-hint').className = 'field-hint';
-    document.getElementById('bday-hint').textContent = v.length === 4 ? '' : '月日を4桁で入力してください（例：4月15日→0415）';
-  } else {
+    document.getElementById('bday-hint').className='field-hint';
+    document.getElementById('bday-hint').textContent=v.length===4?'':'誕生日の月日4桁を入力してください（例：4月15日→0415）';
+  }else{
     el.classList.add('error');
-    document.getElementById('bday-hint').className = 'field-hint ng';
-    document.getElementById('bday-hint').textContent = '4桁で入力してください（現在' + v.length + '桁）';
+    document.getElementById('bday-hint').className='field-hint ng';
+    document.getElementById('bday-hint').textContent='4桁で入力してください（現在'+v.length+'桁）';
   }
 }
-
-function sanitizeTimeInput(el) {
-  const raw = toHankakuInt(el.value);
-  el.value = raw;
-  const n = parseInt(raw) || 0;
-  el.classList.toggle('error', raw !== '' && (n < 0 || n > 720));
+function sanitizeTimeInput(el){
+  const raw=toHankakuInt(el.value);
+  el.value=raw;
+  const n=parseInt(raw)||0;
+  el.classList.toggle('error',raw!==''&&(n<0||n>720));
 }
 
-function renderProfileStatus() {
-  const ok = profile.hrno.length === 4 && profile.name.trim() !== '' && profile.bday.length === 4;
-  const el = document.getElementById('profile-status');
-  el.className = 'profile-status ' + (ok ? 'saved' : 'unsaved');
-  el.querySelector('.status-icon').textContent = ok ? '✓' : '—';
-  document.getElementById('profile-status-text').textContent = ok
-    ? 'HRNO: ' + profile.hrno + '　氏名: ' + profile.name
-    : 'プロフィールが未登録です';
+function renderProfileStatus(){
+  const ok=profile.hrno.length===4&&profile.name.trim()!==''&&profile.bday.length===4;
+  const el=document.getElementById('profile-status');
+  el.className='profile-status '+(ok?'saved':'unsaved');
+  el.querySelector('.status-icon').textContent=ok?'✓':'—';
+  document.getElementById('profile-status-text').textContent=ok
+    ?'HRNO: '+profile.hrno+'　氏名: '+profile.name
+    :'プロフィールが未登録です';
 }
 
-async function init() {
-  const sl = localStorage.getItem('study_logs_v8');
-  const sp = localStorage.getItem('study_profile_v8');
-  if (sl) logs = JSON.parse(sl);
-  if (sp) profile = JSON.parse(sp);
-  document.getElementById('set-hrno').value  = profile.hrno  || '';
-  document.getElementById('set-name').value  = profile.name  || '';
-  document.getElementById('set-bday').value  = profile.bday  || '';
-  if (profile.hrno)  validateHrno(document.getElementById('set-hrno'));
-  if (profile.bday)  validateBday(document.getElementById('set-bday'));
-
+async function init(){
+  const sl=localStorage.getItem('study_logs_v8');
+  const sp=localStorage.getItem('study_profile_v8');
+  if(sl)logs=JSON.parse(sl);
+  if(sp)profile=JSON.parse(sp);
+  document.getElementById('set-hrno').value=profile.hrno||'';
+  document.getElementById('set-name').value=profile.name||'';
+  document.getElementById('set-bday').value=profile.bday||'';
+  if(profile.hrno)validateHrno(document.getElementById('set-hrno'));
+  if(profile.bday)validateBday(document.getElementById('set-bday'));
   initTheme();
-  currentDate = todayDate();
-  statsMonth  = new Date(currentDate);
-  calMonth    = new Date(currentDate);
-
-  const ti = document.getElementById('time-inputs');
-  SUBJECTS.forEach((s, i) => {
-    ti.innerHTML += `<div class="subject-row">
+  currentDate=todayDate();
+  statsMonth=new Date(currentDate);
+  calMonth=new Date(currentDate);
+  const ti=document.getElementById('time-inputs');
+  SUBJECTS.forEach((s,i)=>{
+    ti.innerHTML+=`<div class="subject-row">
       <span class="dot" style="background:${s.color}"></span>
       <span class="subject-name">${s.name}</span>
       <input type="text" inputmode="numeric" pattern="[0-9]*"
@@ -448,171 +407,145 @@ async function init() {
       <span class="unit">分</span>
     </div>`;
   });
-
   renderProfile();
   renderProfileStatus();
   loadDateToForm();
   renderStats();
   renderCal();
-
-  // Firebase同期（起動時に1回だけ取得）
   await syncFromFirebase();
 }
 
-function renderProfile() {
-  const n = profile.name || '未設定';
-  const h = profile.hrno || '';
-  document.getElementById('profile-name-disp').textContent = n;
-  document.getElementById('profile-hrno-disp').textContent = h ? 'HRNO: ' + h : '設定タブでHRNO・氏名を登録してください';
-  const initial = n !== '未設定' ? n.replace(/\s/g,'').charAt(0) : '?';
-  document.getElementById('avatar-initials').textContent = initial;
+function renderProfile(){
+  const n=profile.name||'未設定';
+  const h=profile.hrno||'';
+  document.getElementById('profile-name-disp').textContent=n;
+  document.getElementById('profile-hrno-disp').textContent=h?'HRNO: '+h:'設定タブでHRNO・氏名を登録してください';
+  const initial=n!=='未設定'?n.replace(/\s/g,'').charAt(0):'?';
+  document.getElementById('avatar-initials').textContent=initial;
 }
 
-function loadDateToForm() {
-  const k  = dateStr(currentDate);
-  const td = dateStr(todayDate());
-  const yd = dateStr(yesterdayDate());
-  const isToday     = k === td;
-  const isYesterday = k === yd;
-  const wd = DOW[currentDate.getDay()];
-
-  const disp = document.getElementById('date-disp');
-  disp.textContent = currentDate.getFullYear() + '年' + (currentDate.getMonth()+1) + '月' + currentDate.getDate() + '日（' + wd + '）';
-  disp.className = 'date-display' + (logs[k] ? ' has-log' : '');
-
-  const badge = document.getElementById('date-badge');
-  if (isToday) {
-    badge.textContent = '今日'; badge.className = 'date-badge badge-today';
-  } else if (isYesterday) {
-    badge.textContent = '昨日'; badge.className = 'date-badge badge-yesterday';
-  } else {
-    badge.textContent = ''; badge.className = 'date-badge badge-hidden';
-  }
-
-  document.getElementById('btn-next').disabled = isToday;
-  const l = logs[k];
-  SUBJECTS.forEach((_, i) => {
-    const el = document.getElementById('t' + i);
-    el.value = l ? (l.times[i] || '') : '';
+function loadDateToForm(){
+  const k=dateStr(currentDate);
+  const td=dateStr(todayDate());
+  const yd=dateStr(yesterdayDate());
+  const isToday=k===td,isYesterday=k===yd;
+  const wd=DOW[currentDate.getDay()];
+  const disp=document.getElementById('date-disp');
+  disp.textContent=currentDate.getFullYear()+'年'+(currentDate.getMonth()+1)+'月'+currentDate.getDate()+'日（'+wd+'）';
+  disp.className='date-display'+(logs[k]?' has-log':'');
+  const badge=document.getElementById('date-badge');
+  if(isToday){badge.textContent='今日';badge.className='date-badge badge-today';}
+  else if(isYesterday){badge.textContent='昨日';badge.className='date-badge badge-yesterday';}
+  else{badge.textContent='';badge.className='date-badge badge-hidden';}
+  document.getElementById('btn-next').disabled=isToday;
+  const l=logs[k];
+  SUBJECTS.forEach((_,i)=>{
+    const el=document.getElementById('t'+i);
+    el.value=l?(l.times[i]||''):'';
     el.classList.remove('error');
   });
-  document.getElementById('note').value = l ? (l.note || '') : '';
-  document.getElementById('send-status').textContent = '';
+  document.getElementById('note').value=l?(l.note||''):'';
+  document.getElementById('send-status').textContent='';
 }
 
-function shiftDate(d) {
-  const nd = new Date(currentDate);
-  nd.setDate(nd.getDate() + d);
-  if (nd > todayDate()) return;
-  currentDate = nd;
+function shiftDate(d){
+  const nd=new Date(currentDate);
+  nd.setDate(nd.getDate()+d);
+  if(nd>todayDate())return;
+  currentDate=nd;
   loadDateToForm();
 }
 
-async function saveAndSend() {
-  if (!profile.hrno || !profile.name) { showToast('設定タブでHRNO・氏名を登録してください'); return; }
-
-  let hasError = false;
-  const times = SUBJECTS.map((_, i) => {
-    const el = document.getElementById('t' + i);
+async function saveAndSend(){
+  if(!profile.hrno||!profile.name){showToast('設定タブでHRNO・氏名を登録してください');return;}
+  let hasError=false;
+  const times=SUBJECTS.map((_,i)=>{
+    const el=document.getElementById('t'+i);
     sanitizeTimeInput(el);
-    if (el.classList.contains('error')) hasError = true;
-    return parseInt(el.value) || 0;
+    if(el.classList.contains('error'))hasError=true;
+    return parseInt(el.value)||0;
   });
-  if (hasError) { showToast('入力値を確認してください（0〜720分）'); return; }
-
-  const k    = dateStr(currentDate);
-  const note = document.getElementById('note').value;
-  logs[k] = { times, note };
-  localStorage.setItem('study_logs_v8', JSON.stringify(logs));
-  loadDateToForm(); renderStats(); renderCal();
-
-  const statusEl = document.getElementById('send-status');
-  const btn      = document.getElementById('save-btn');
-
-  btn.disabled = true; btn.textContent = '送信中…'; statusEl.textContent = '';
-
-  // Firebase同期
-  if (canSync()) {
-    const fbOk = await fbSet(logs);
-    if (fbOk) {
-      document.getElementById('sync-status').textContent = '同期済み ✓';
-      document.getElementById('sync-status').className = 'sync-status ok';
-    } else {
-      document.getElementById('sync-status').textContent = '同期失敗（ローカルには保存済み）';
-      document.getElementById('sync-status').className = 'sync-status ng';
-    }
+  if(hasError){showToast('入力値を確認してください（0〜720分）');return;}
+  const k=dateStr(currentDate);
+  const note=document.getElementById('note').value;
+  logs[k]={times,note};
+  localStorage.setItem('study_logs_v8',JSON.stringify(logs));
+  loadDateToForm();renderStats();renderCal();
+  const statusEl=document.getElementById('send-status');
+  const btn=document.getElementById('save-btn');
+  btn.disabled=true;btn.textContent='送信中…';statusEl.textContent='';
+  if(canSync()){
+    const fbOk=await fbSet(logs);
+    const syncEl=document.getElementById('sync-status');
+    if(fbOk){syncEl.textContent='同期済み ✓';syncEl.className='sync-status ok';}
+    else{syncEl.textContent='同期失敗（ローカルには保存済み）';syncEl.className='sync-status ng';}
   }
-
-  // Sheetsに送信
-  try {
-    const payload = { date: k, hrno: profile.hrno, name: profile.name, times, note };
-    await fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+  try{
+    const payload={date:k,hrno:profile.hrno,name:profile.name,times,note};
+    await fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)});
     showToast('記録して送信しました！');
-    statusEl.textContent = '送信完了 ✓';
-  } catch(e) {
+    statusEl.textContent='送信完了 ✓';
+  }catch(e){
     showToast('送信に失敗しました（記録は保存済み）');
-    statusEl.textContent = '送信失敗 — 後でもう一度お試しください';
-  } finally {
-    btn.disabled = false; btn.textContent = '記録して送信';
+    statusEl.textContent='送信失敗 — 後でもう一度お試しください';
+  }finally{
+    btn.disabled=false;btn.textContent='記録して送信';
   }
 }
 
-async function saveProfile() {
-  const hrnoEl  = document.getElementById('set-hrno');
-  const nameVal = document.getElementById('set-name').value.trim();
-  const bdayEl  = document.getElementById('set-bday');
-  validateHrno(hrnoEl);
-  validateBday(bdayEl);
-  if (hrnoEl.value.length !== 4) { showToast('HRNOは4桁の半角数字で入力してください'); return; }
-  if (!nameVal) { showToast('氏名を入力してください'); return; }
-  if (bdayEl.value.length !== 4) { showToast('生年月日は月日4桁で入力してください'); return; }
-  profile.hrno = hrnoEl.value;
-  profile.name = nameVal;
-  profile.bday = bdayEl.value;
-  localStorage.setItem('study_profile_v8', JSON.stringify(profile));
-  renderProfile();
-  renderProfileStatus();
+async function saveProfile(){
+  const hrnoEl=document.getElementById('set-hrno');
+  const nameVal=document.getElementById('set-name').value.trim();
+  const bdayEl=document.getElementById('set-bday');
+  validateHrno(hrnoEl);validateBday(bdayEl);
+  if(hrnoEl.value.length!==4){showToast('HRNOは4桁の半角数字で入力してください');return;}
+  if(!nameVal){showToast('氏名を入力してください');return;}
+  if(bdayEl.value.length!==4){showToast('パスコードは月日4桁で入力してください');return;}
+  profile.hrno=hrnoEl.value;
+  profile.name=nameVal;
+  profile.bday=bdayEl.value;
+  localStorage.setItem('study_profile_v8',JSON.stringify(profile));
+  renderProfile();renderProfileStatus();
   showToast('プロフィールを保存しました');
-  // 保存後にFirebaseから同期
   await syncFromFirebase();
 }
 
-function changeMonth(d)    { statsMonth = new Date(statsMonth.getFullYear(), statsMonth.getMonth()+d, 1); renderStats(); }
-function changeCalMonth(d) { calMonth   = new Date(calMonth.getFullYear(),   calMonth.getMonth()+d,   1); renderCal();   }
+function changeMonth(d){statsMonth=new Date(statsMonth.getFullYear(),statsMonth.getMonth()+d,1);renderStats();}
+function changeCalMonth(d){calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+d,1);renderCal();}
 
-function calcStreak() {
-  function hasValidLog(k) { return logs[k] && totalMinutes(logs[k]) >= 1; }
-  let current = 0;
-  const d = todayDate();
-  while (hasValidLog(dateStr(d))) { current++; d.setDate(d.getDate()-1); }
-  if (current > 0) return current;
-  const keys = Object.keys(logs).filter(k => totalMinutes(logs[k]) >= 1).sort();
-  if (keys.length === 0) return 0;
-  if (keys.length === 1) return 1;
-  let maxStreak = 1, streak = 1;
-  for (let i = 1; i < keys.length; i++) {
-    const prev = new Date(keys[i-1]);
-    const curr = new Date(keys[i]);
-    const diff = (curr - prev) / (1000 * 60 * 60 * 24);
-    if (diff === 1) { streak++; if (streak > maxStreak) maxStreak = streak; }
-    else { streak = 1; }
+function calcStreak(){
+  function hasValidLog(k){return logs[k]&&totalMinutes(logs[k])>=1;}
+  let current=0;
+  const d=todayDate();
+  while(hasValidLog(dateStr(d))){current++;d.setDate(d.getDate()-1);}
+  if(current>0)return current;
+  const keys=Object.keys(logs).filter(k=>totalMinutes(logs[k])>=1).sort();
+  if(keys.length===0)return 0;
+  if(keys.length===1)return 1;
+  let maxStreak=1,streak=1;
+  for(let i=1;i<keys.length;i++){
+    const prev=new Date(keys[i-1]);
+    const curr=new Date(keys[i]);
+    const diff=(curr-prev)/(1000*60*60*24);
+    if(diff===1){streak++;if(streak>maxStreak)maxStreak=streak;}
+    else{streak=1;}
   }
   return maxStreak;
 }
 
-function renderStats() {
-  const mk = monthKey(statsMonth);
-  document.getElementById('month-title').textContent = statsMonth.getFullYear() + '年' + (statsMonth.getMonth()+1) + '月';
-  const entries = Object.entries(logs).filter(([k, v]) => k.startsWith(mk) && totalMinutes(v) >= 1);
-  const days    = entries.length;
-  const totals  = SUBJECTS.map((_, i) => entries.reduce((s, [, v]) => s + (v.times[i] || 0), 0));
-  const grand   = totals.reduce((a, b) => a + b, 0);
-  document.getElementById('s-days').textContent   = days;
-  document.getElementById('s-total').textContent  = (grand / 60).toFixed(1);
-  document.getElementById('s-avg').textContent    = days ? Math.round(grand / days) : 0;
-  document.getElementById('s-streak').textContent = calcStreak();
-  const maxT = Math.max(...totals, 1);
-  document.getElementById('bar-chart').innerHTML = SUBJECTS.map((s, i) => `
+function renderStats(){
+  const mk=monthKey(statsMonth);
+  document.getElementById('month-title').textContent=statsMonth.getFullYear()+'年'+(statsMonth.getMonth()+1)+'月';
+  const entries=Object.entries(logs).filter(([k,v])=>k.startsWith(mk)&&totalMinutes(v)>=1);
+  const days=entries.length;
+  const totals=SUBJECTS.map((_,i)=>entries.reduce((s,[,v])=>s+(v.times[i]||0),0));
+  const grand=totals.reduce((a,b)=>a+b,0);
+  document.getElementById('s-days').textContent=days;
+  document.getElementById('s-total').textContent=(grand/60).toFixed(1);
+  document.getElementById('s-avg').textContent=days?Math.round(grand/days):0;
+  document.getElementById('s-streak').textContent=calcStreak();
+  const maxT=Math.max(...totals,1);
+  document.getElementById('bar-chart').innerHTML=SUBJECTS.map((s,i)=>`
     <div class="bar-row">
       <span class="bar-label">${s.name}</span>
       <div class="bar-track"><div class="bar-fill" style="width:${Math.round(totals[i]/maxT*100)}%;background:${s.color}"></div></div>
@@ -620,47 +553,47 @@ function renderStats() {
     </div>`).join('');
 }
 
-function renderCal() {
-  document.getElementById('cal-month-title').textContent = calMonth.getFullYear() + '年' + (calMonth.getMonth()+1) + '月';
-  document.getElementById('cal-header').innerHTML = DOW.map(l => `<div class="week-label">${l}</div>`).join('');
-  const first = new Date(calMonth.getFullYear(), calMonth.getMonth(), 1);
-  const last  = new Date(calMonth.getFullYear(), calMonth.getMonth()+1, 0);
-  const td    = dateStr(todayDate());
-  let cells = '';
-  for (let i = 0; i < first.getDay(); i++) cells += `<div></div>`;
-  for (let d = 1; d <= last.getDate(); d++) {
-    const k     = calMonth.getFullYear() + '-' + pad(calMonth.getMonth()+1) + '-' + pad(d);
-    const valid = logs[k] && totalMinutes(logs[k]) >= 1;
-    cells += `<div class="day-cell${valid?' has-log':''}${k===td?' today':''}" onclick="showDayDetail('${k}')">${d}</div>`;
+function renderCal(){
+  document.getElementById('cal-month-title').textContent=calMonth.getFullYear()+'年'+(calMonth.getMonth()+1)+'月';
+  document.getElementById('cal-header').innerHTML=DOW.map(l=>`<div class="week-label">${l}</div>`).join('');
+  const first=new Date(calMonth.getFullYear(),calMonth.getMonth(),1);
+  const last=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,0);
+  const td=dateStr(todayDate());
+  let cells='';
+  for(let i=0;i<first.getDay();i++)cells+=`<div></div>`;
+  for(let d=1;d<=last.getDate();d++){
+    const k=calMonth.getFullYear()+'-'+pad(calMonth.getMonth()+1)+'-'+pad(d);
+    const valid=logs[k]&&totalMinutes(logs[k])>=1;
+    cells+=`<div class="day-cell${valid?' has-log':''}${k===td?' today':''}" onclick="showDayDetail('${k}')">${d}</div>`;
   }
-  document.getElementById('cal-grid').innerHTML = cells;
+  document.getElementById('cal-grid').innerHTML=cells;
 }
 
-function showDayDetail(k) {
-  const l   = logs[k];
-  const det = document.getElementById('day-detail');
-  if (!l) { det.innerHTML = ''; return; }
-  const total = totalMinutes(l);
-  det.innerHTML = `<div class="card" style="margin-top:12px;">
+function showDayDetail(k){
+  const l=logs[k];
+  const det=document.getElementById('day-detail');
+  if(!l){det.innerHTML='';return;}
+  const total=totalMinutes(l);
+  det.innerHTML=`<div class="card" style="margin-top:12px;">
     <p class="card-title">${k}の記録（合計 ${total}分）</p>
-    ${SUBJECTS.map((s, i) => l.times[i] ? `<div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--border-sub);">
-      <span style="color:${s.color};font-weight:600;">${s.name}</span><span>${l.times[i]}分</span></div>` : '').join('')}
-    ${l.note ? `<p style="font-size:12px;color:var(--text-sub);margin-top:8px;">${l.note}</p>` : ''}
+    ${SUBJECTS.map((s,i)=>l.times[i]?`<div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--border-sub);">
+      <span style="color:${s.color};font-weight:600;">${s.name}</span><span>${l.times[i]}分</span></div>`:'').join('')}
+    ${l.note?`<p style="font-size:12px;color:var(--text-sub);margin-top:8px;">${l.note}</p>`:''}
   </div>`;
 }
 
-function switchTab(t) {
-  document.querySelectorAll('.tab').forEach((el, i) => el.classList.toggle('active', ['log','stats','calendar','settings'][i] === t));
-  document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['log','stats','calendar','settings'][i]===t));
+  document.querySelectorAll('.section').forEach(el=>el.classList.remove('active'));
   document.getElementById(t).classList.add('active');
-  if (t === 'stats')    renderStats();
-  if (t === 'calendar') renderCal();
+  if(t==='stats')renderStats();
+  if(t==='calendar')renderCal();
 }
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2300);
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2300);
 }
 
 init();
