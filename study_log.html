@@ -111,6 +111,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
 .profile-status{border-radius:8px;padding:10px 14px;margin-top:14px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;}
 .profile-status.saved{background:#E1F5EE;color:#085041;}
 .profile-status.unsaved{background:#FCEBEB;color:#A32D2D;}
+.sync-status{font-size:12px;color:var(--text-sub);margin-top:8px;padding:8px 10px;background:var(--bg-sub);border-radius:8px;text-align:center;}
+.sync-status.ok{color:#0F6E56;}
+.sync-status.ng{color:#A32D2D;}
 .theme-selector{display:flex;gap:8px;margin-top:8px;}
 .theme-btn{flex:1;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer;background:var(--bg-sub);color:var(--text);text-align:center;}
 .theme-btn.active{border-color:#1D9E75;color:#1D9E75;font-weight:600;}
@@ -184,7 +187,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
     <div id="bar-chart"></div>
   </div>
 
-  <!-- ★ Tips エリア：-->
+  <!-- ★ Tips エリア： -->
   <div class="tips-card">
     <div class="tips-label">Tips</div>
     <div class="tips-text">毎日勉強時間はしっかりと記録しましょう！</div>
@@ -218,11 +221,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
     <span class="setting-label">氏名</span>
     <input type="text" class="text-input" id="set-name" placeholder="例：山田 太郎">
   </div>
+  <div class="setting-row">
+    <span class="setting-label">生年月日</span>
+    <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4"
+      class="text-input" id="set-bday" placeholder="例：0415（月日4桁）"
+      oninput="sanitizeBday(this)" onblur="validateBday(this)">
+  </div>
+  <div class="field-hint" id="bday-hint">月日を4桁で入力してください（例：4月15日→0415）</div>
   <button class="btn-primary" onclick="saveProfile()">保存</button>
   <div class="profile-status unsaved" id="profile-status">
     <span class="status-icon">—</span>
     <span id="profile-status-text">プロフィールが未登録です</span>
   </div>
+  <div class="sync-status" id="sync-status">同期：未設定</div>
 
   <p class="section-head" style="margin-top:20px;">表示モード</p>
   <div class="theme-selector">
@@ -249,6 +260,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
 
 <script>
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbxF41OQklJVUKf4Im_G1MT857TrBAC3v-ujRdi0jzGjk3pWnRkzviFgtZ2v3KSQl3K5Rg/exec';
+const FB_URL  = 'https://study-log-58f8e-default-rtdb.firebaseio.com/students';
 
 const SUBJECTS = [
   { name: '国語',   color: '#D4537E' },
@@ -259,7 +271,7 @@ const SUBJECTS = [
   { name: 'その他', color: '#888780' }
 ];
 const DOW = ['日','月','火','水','木','金','土'];
-let logs = {}, profile = { hrno: '', name: '' };
+let logs = {}, profile = { hrno: '', name: '', bday: '' };
 let currentDate, statsMonth, calMonth;
 
 function pad(n) { return String(n).padStart(2, '0'); }
@@ -268,7 +280,54 @@ function todayDate() { const d = new Date(); d.setHours(0,0,0,0); return d; }
 function yesterdayDate() { const d = new Date(); d.setDate(d.getDate()-1); d.setHours(0,0,0,0); return d; }
 function monthKey(d) { return d.getFullYear() + '-' + pad(d.getMonth()+1); }
 function totalMinutes(l) { return l ? l.times.reduce((a,b) => a+b, 0) : 0; }
+function fbKey() { return profile.hrno + '_' + profile.bday; }
+function canSync() { return profile.hrno.length === 4 && profile.bday.length === 4; }
 
+/* Firebase REST API */
+async function fbGet() {
+  try {
+    const res = await fetch(FB_URL + '/' + fbKey() + '.json');
+    const data = await res.json();
+    return data;
+  } catch(e) { return null; }
+}
+
+async function fbSet(data) {
+  try {
+    await fetch(FB_URL + '/' + fbKey() + '.json', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    return true;
+  } catch(e) { return false; }
+}
+
+/* 起動時にFirebaseからデータを取得 */
+async function syncFromFirebase() {
+  if (!canSync()) {
+    document.getElementById('sync-status').textContent = '同期：HRNO・生年月日を設定してください';
+    document.getElementById('sync-status').className = 'sync-status';
+    return;
+  }
+  document.getElementById('sync-status').textContent = '同期中…';
+  document.getElementById('sync-status').className = 'sync-status';
+  const data = await fbGet();
+  if (data && typeof data === 'object') {
+    logs = data;
+    localStorage.setItem('study_logs_v8', JSON.stringify(logs));
+    loadDateToForm();
+    renderStats();
+    renderCal();
+    document.getElementById('sync-status').textContent = '同期済み ✓';
+    document.getElementById('sync-status').className = 'sync-status ok';
+  } else {
+    document.getElementById('sync-status').textContent = '同期：クラウドにデータがありません（初回）';
+    document.getElementById('sync-status').className = 'sync-status';
+  }
+}
+
+/* テーマ管理 */
 function applyTheme(theme) {
   const app = document.getElementById('app');
   if (theme === 'dark') {
@@ -324,6 +383,26 @@ function validateHrno(el) {
   }
 }
 
+function sanitizeBday(el) {
+  el.value = toHankakuInt(el.value).slice(0, 4);
+  el.classList.remove('error');
+  document.getElementById('bday-hint').className = 'field-hint';
+  document.getElementById('bday-hint').textContent = '月日を4桁で入力してください（例：4月15日→0415）';
+}
+
+function validateBday(el) {
+  const v = el.value;
+  if (v === '' || v.length === 4) {
+    el.classList.remove('error');
+    document.getElementById('bday-hint').className = 'field-hint';
+    document.getElementById('bday-hint').textContent = v.length === 4 ? '' : '月日を4桁で入力してください（例：4月15日→0415）';
+  } else {
+    el.classList.add('error');
+    document.getElementById('bday-hint').className = 'field-hint ng';
+    document.getElementById('bday-hint').textContent = '4桁で入力してください（現在' + v.length + '桁）';
+  }
+}
+
 function sanitizeTimeInput(el) {
   const raw = toHankakuInt(el.value);
   el.value = raw;
@@ -332,7 +411,7 @@ function sanitizeTimeInput(el) {
 }
 
 function renderProfileStatus() {
-  const ok = profile.hrno.length === 4 && profile.name.trim() !== '';
+  const ok = profile.hrno.length === 4 && profile.name.trim() !== '' && profile.bday.length === 4;
   const el = document.getElementById('profile-status');
   el.className = 'profile-status ' + (ok ? 'saved' : 'unsaved');
   el.querySelector('.status-icon').textContent = ok ? '✓' : '—';
@@ -341,14 +420,16 @@ function renderProfileStatus() {
     : 'プロフィールが未登録です';
 }
 
-function init() {
+async function init() {
   const sl = localStorage.getItem('study_logs_v8');
   const sp = localStorage.getItem('study_profile_v8');
   if (sl) logs = JSON.parse(sl);
   if (sp) profile = JSON.parse(sp);
-  document.getElementById('set-hrno').value = profile.hrno || '';
+  document.getElementById('set-hrno').value  = profile.hrno  || '';
   document.getElementById('set-name').value  = profile.name  || '';
-  if (profile.hrno) validateHrno(document.getElementById('set-hrno'));
+  document.getElementById('set-bday').value  = profile.bday  || '';
+  if (profile.hrno)  validateHrno(document.getElementById('set-hrno'));
+  if (profile.bday)  validateBday(document.getElementById('set-bday'));
 
   initTheme();
   currentDate = todayDate();
@@ -372,6 +453,9 @@ function init() {
   loadDateToForm();
   renderStats();
   renderCal();
+
+  // Firebase同期（起動時に1回だけ取得）
+  await syncFromFirebase();
 }
 
 function renderProfile() {
@@ -445,6 +529,20 @@ async function saveAndSend() {
   const btn      = document.getElementById('save-btn');
 
   btn.disabled = true; btn.textContent = '送信中…'; statusEl.textContent = '';
+
+  // Firebase同期
+  if (canSync()) {
+    const fbOk = await fbSet(logs);
+    if (fbOk) {
+      document.getElementById('sync-status').textContent = '同期済み ✓';
+      document.getElementById('sync-status').className = 'sync-status ok';
+    } else {
+      document.getElementById('sync-status').textContent = '同期失敗（ローカルには保存済み）';
+      document.getElementById('sync-status').className = 'sync-status ng';
+    }
+  }
+
+  // Sheetsに送信
   try {
     const payload = { date: k, hrno: profile.hrno, name: profile.name, times, note };
     await fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
@@ -458,18 +556,24 @@ async function saveAndSend() {
   }
 }
 
-function saveProfile() {
+async function saveProfile() {
   const hrnoEl  = document.getElementById('set-hrno');
   const nameVal = document.getElementById('set-name').value.trim();
+  const bdayEl  = document.getElementById('set-bday');
   validateHrno(hrnoEl);
+  validateBday(bdayEl);
   if (hrnoEl.value.length !== 4) { showToast('HRNOは4桁の半角数字で入力してください'); return; }
   if (!nameVal) { showToast('氏名を入力してください'); return; }
+  if (bdayEl.value.length !== 4) { showToast('生年月日は月日4桁で入力してください'); return; }
   profile.hrno = hrnoEl.value;
   profile.name = nameVal;
+  profile.bday = bdayEl.value;
   localStorage.setItem('study_profile_v8', JSON.stringify(profile));
   renderProfile();
   renderProfileStatus();
   showToast('プロフィールを保存しました');
+  // 保存後にFirebaseから同期
+  await syncFromFirebase();
 }
 
 function changeMonth(d)    { statsMonth = new Date(statsMonth.getFullYear(), statsMonth.getMonth()+d, 1); renderStats(); }
