@@ -106,10 +106,10 @@ tr:last-child td{border-bottom:none;}
   </div>
 
   <div class="tab-bar">
-    <div class="tab active" onclick="switchTab('daily')">日別入力状況</div>
-    <div class="tab" onclick="switchTab('attendance')">出席簿</div>
-    <div class="tab" onclick="switchTab('summary')">生徒サマリー</div>
-    <div class="tab" onclick="switchTab('student')">生徒別詳細</div>
+   <div class="tab active" onclick="switchTab('daily')">日別入力状況</div>
+   <div class="tab" onclick="switchTab('student')">生徒別詳細</div>
+   <div class="tab" onclick="switchTab('attendance')">生徒入力状況確認</div>
+   <div class="tab" onclick="switchTab('summary')">生徒サマリー</div>
   </div>
 
   <!-- 日別タブ -->
@@ -234,7 +234,7 @@ function initAdmin(){
 }
 
 function switchTab(t){
-  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['daily','attendance','summary','student'][i]===t));
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['daily','student','attendance','summary'][i]===t));
   document.querySelectorAll('.section').forEach(el=>el.classList.remove('active'));
   document.getElementById('tab-'+t).classList.add('active');
 }
