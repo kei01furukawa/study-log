@@ -195,6 +195,10 @@ async function doLogin(){
   const errEl=document.getElementById('login-error');
   errEl.textContent='';
   if(!pass){errEl.textContent='パスワードを入力してください';return;}
+  const loginCard=document.querySelector('#login-screen .card');
+  loginCard.style.opacity='0.5';
+  loginCard.style.pointerEvents='none';
+  errEl.textContent='認証中…';
   try{
     const res=await fetch(GAS_URL+'?pass='+encodeURIComponent(pass)+'&type=students');
     const data=await res.json();
@@ -204,7 +208,9 @@ async function doLogin(){
     document.getElementById('login-screen').style.display='none';
     document.getElementById('admin-screen').style.display='block';
     initAdmin();
-  }catch(e){
+}catch(e){
+    loginCard.style.opacity='';
+    loginCard.style.pointerEvents='';
     errEl.textContent='接続に失敗しました。しばらくしてから再試行してください。';
   }
 }
