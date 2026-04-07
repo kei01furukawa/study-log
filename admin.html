@@ -54,8 +54,16 @@ tr:last-child td{border-bottom:none;}
 .attendance-table th{padding:6px 8px;border:1px solid #e0e0e0;background:#f8f8f8;color:#888;font-weight:600;text-align:center;white-space:nowrap;}
 .attendance-table td{padding:4px 6px;border:1px solid #f0f0f0;text-align:center;}
 .att-cell-in{background:#9FE1CB;color:#085041;font-weight:600;border-radius:4px;}
+.att-cell-zero{background:#FCEBEB;color:#E24B4A;font-weight:600;border-radius:4px;}
 .att-cell-out{color:#ddd;}
 .att-hrno{text-align:left;font-weight:600;color:#1a1a1a;white-space:nowrap;padding:4px 10px;}
+.toggle-wrap{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;color:#666;}
+.toggle{position:relative;width:44px;height:24px;cursor:pointer;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:#ddd;border-radius:12px;transition:.2s;}
+.toggle-slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;}
+.toggle input:checked+.toggle-slider{background:#1D9E75;}
+.toggle input:checked+.toggle-slider:before{transform:translateX(20px);}
 .sortable{cursor:pointer;user-select:none;}
 .sortable:hover{color:#1D9E75;}
 .sort-arrow{margin-left:4px;font-size:10px;}
@@ -131,7 +139,14 @@ tr:last-child td{border-bottom:none;}
   <!-- 生徒入力状況確認タブ -->
   <div id="tab-attendance" class="section">
     <div class="card">
-      <p class="card-title">月別 入力状況（生徒入力状況確認）</p>
+      <p class="card-title">月別 入力状況</p>
+      <div class="toggle-wrap">
+        <label class="toggle">
+          <input type="checkbox" id="att-toggle" onchange="toggleAttView()">
+          <span class="toggle-slider"></span>
+        </label>
+        <span id="att-toggle-label">分で表示中 → 切替で〇×表示</span>
+      </div>
       <div class="month-nav">
         <button onclick="changeAttMonth(-1)">◀</button>
         <span id="att-month-title"></span>
@@ -160,8 +175,6 @@ tr:last-child td{border-bottom:none;}
     </div>
   </div>
 </div>
-
-<div class="toast" id="toast" style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#085041;color:#fff;padding:10px 22px;border-radius:22px;font-size:13px;font-weight:500;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:99;"></div>
 
 <script>
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbxF41OQklJVUKf4Im_G1MT857TrBAC3v-ujRdi0jzGjk3pWnRkzviFgtZ2v3KSQl3K5Rg/exec';
@@ -298,6 +311,9 @@ function changeAttMonth(d){
 async function loadAttendance(){
   const wrap=document.getElementById('attendance-wrap');
   wrap.innerHTML='<p class="loading">読み込み中…</p>';
+  // トグルをリセット
+  document.getElementById('att-toggle').checked=false;
+  document.getElementById('att-toggle-label').textContent='分で表示中 → 切替で〇×表示';
   const mk=monthKey(attMonth);
   const daysInMonth=new Date(attMonth.getFullYear(),attMonth.getMonth()+1,0).getDate();
   try{
@@ -312,15 +328,22 @@ async function loadAttendance(){
     results.forEach(({hrno,logs})=>{
       const logMap={};
       logs.forEach(l=>{if(l.date.startsWith(mk))logMap[l.date]=l;});
-      const days=Object.keys(logMap).length;
+      const days=Object.keys(logMap).filter(k=>{
+        const l=logMap[k];
+        return l&&l.times.reduce((a,b)=>a+Number(b),0)>0;
+      }).length;
       html+=`<tr><td class="att-hrno">${hrno}</td>`;
       for(let d=1;d<=daysInMonth;d++){
         const k=mk+'-'+pad(d);
         const l=logMap[k];
-        const total=l?l.times.reduce((a,b)=>a+Number(b),0):0;
-        if(l&&total>0) html+=`<td><span class="att-cell-in">${total}</span></td>`;
-        else if(l) html+=`<td><span style="color:#ccc;font-size:10px;">0</span></td>`;
-        else html+=`<td class="att-cell-out">—</td>`;
+        const total=l?l.times.reduce((a,b)=>a+Number(b),0):null;
+        if(total===null){
+          html+=`<td><span class="att-cell-out att-val" data-orig="—">—</span></td>`;
+        } else if(total===0){
+          html+=`<td><span class="att-cell-zero att-val" data-orig="0">0</span></td>`;
+        } else {
+          html+=`<td><span class="att-cell-in att-val" data-orig="${total}">${total}</span></td>`;
+        }
       }
       html+=`<td><strong>${days}</strong></td></tr>`;
     });
@@ -329,6 +352,21 @@ async function loadAttendance(){
   }catch(e){
     wrap.innerHTML='<p style="color:#E24B4A;">接続に失敗しました。</p>';
   }
+}
+
+function toggleAttView(){
+  const checked=document.getElementById('att-toggle').checked;
+  document.getElementById('att-toggle-label').textContent=checked?'〇×表示中 → 切替で分表示':'分で表示中 → 切替で〇×表示';
+  document.querySelectorAll('.att-val').forEach(el=>{
+    const orig=el.dataset.orig;
+    if(checked){
+      if(orig==='—') el.textContent='×';
+      else if(orig==='0') el.textContent='0';
+      else el.textContent='〇';
+    } else {
+      el.textContent=orig;
+    }
+  });
 }
 
 function updateSumMonthTitle(){
@@ -439,8 +477,8 @@ function renderStudentDetail(hrno){
     <div class="stat-grid">
       <div class="stat-card"><div class="stat-num">${days}</div><div class="stat-lbl">記録日数</div></div>
       <div class="stat-card"><div class="stat-num">${(grand/60).toFixed(1)}</div><div class="stat-lbl">総学習時間(h)</div></div>
-      <div class="stat-card"><div class="stat-num">${days?Math.round(grand/days):0}</div><div class="stat-lbl">平均時間/日(分)</div></div>
-      <div class="stat-card"><div class="stat-num">${grand}</div><div class="stat-lbl">月合計(分)</div></div>
+      <div class="stat-card"><div class="stat-num">${days?(grand/days/60).toFixed(1):0}</div><div class="stat-lbl">平均時間/日(h)</div></div>
+      <div class="stat-card"><div class="stat-num">${(grand/60).toFixed(1)}</div><div class="stat-lbl">月合計(h)</div></div>
     </div>
     <p class="card-title" style="margin-bottom:8px;">教科別 学習時間（分計）</p>
     ${SUBJECTS.map((s,i)=>`
