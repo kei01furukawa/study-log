@@ -40,7 +40,7 @@ tr:last-child td{border-bottom:none;}
 .link-btn{background:none;border:none;color:#1D9E75;font-size:13px;cursor:pointer;text-decoration:underline;padding:0;}
 .student-select-row{display:flex;align-items:center;gap:12px;margin-bottom:1rem;flex-wrap:wrap;}
 .student-select-row select{height:38px;border:1px solid #ddd;border-radius:8px;padding:0 10px;font-size:14px;min-width:160px;}
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem;}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem;}
 .stat-card{background:#f8f8f8;border-radius:10px;padding:10px 12px;text-align:center;}
 .stat-num{font-size:22px;font-weight:600;color:#1a1a1a;}
 .stat-lbl{font-size:11px;color:#888;margin-top:2px;}
@@ -72,6 +72,7 @@ tr:last-child td{border-bottom:none;}
 .month-nav{display:flex;align-items:center;gap:8px;margin-bottom:1rem;}
 .month-nav button{background:#fff;border:1px solid #ddd;border-radius:8px;padding:4px 12px;font-size:13px;cursor:pointer;}
 .month-nav span{font-size:14px;font-weight:600;min-width:100px;text-align:center;}
+.student-name-header{background:#f0faf6;border-radius:8px;padding:10px 14px;margin-bottom:1rem;font-size:14px;font-weight:600;color:#085041;}
 .loading{text-align:center;padding:2rem;color:#888;font-size:14px;}
 .section{display:none;}.section.active{display:block;}
 </style>
@@ -106,7 +107,7 @@ tr:last-child td{border-bottom:none;}
     <div class="tab active" onclick="switchTab('daily')">日別入力状況</div>
     <div class="tab" onclick="switchTab('student')">生徒別詳細</div>
     <div class="tab" onclick="switchTab('attendance')">生徒入力状況確認</div>
-    <div class="tab" onclick="switchTab('summary')">生徒サマリー</div>
+    <div class="tab" onclick="switchTab('summary')">生徒別月次サマリー</div>
   </div>
 
   <!-- 日別タブ -->
@@ -185,6 +186,7 @@ const SUBJECT_COLORS = ['#D4537E','#378ADD','#1D9E75','#EF9F27','#7F77DD','#8887
 let sessionPass = '';
 let allStudents = [];
 let studentLogs = {};
+let studentName = '';
 let currentMonth = new Date();
 let attMonth = new Date();
 let sumMonth = new Date();
@@ -245,9 +247,10 @@ function initAdmin(){
   updateSumMonthTitle();
   const sel=document.getElementById('student-select');
   sel.innerHTML='<option value="">生徒を選択してください</option>';
-  allStudents.forEach(h=>{
+  allStudents.forEach(s=>{
     const opt=document.createElement('option');
-    opt.value=h;opt.textContent='HRNO: '+h;
+    opt.value=s.hrno;
+    opt.textContent='HRNO: '+s.hrno+(s.name?' ／ '+s.name:'');
     sel.appendChild(opt);
   });
 }
@@ -271,7 +274,7 @@ async function loadDaily(){
     if(data.error){wrap.innerHTML='<p style="color:#E24B4A;">エラー：'+data.error+'</p>';return;}
     const submitted=data.logs;
     const submittedHrnos=submitted.map(l=>String(l.hrno));
-    const notSubmitted=allStudents.filter(h=>!submittedHrnos.includes(String(h)));
+    const notSubmitted=allStudents.filter(s=>!submittedHrnos.includes(String(s.hrno)));
     badges.innerHTML=
       `<span class="badge badge-in">入力済み ${submitted.length}名</span>`+
       `<span class="badge badge-out">未入力 ${notSubmitted.length}名</span>`;
@@ -286,12 +289,12 @@ async function loadDaily(){
         <td><button class="link-btn" onclick="jumpToStudent('${l.hrno}')">詳細</button></td>
       </tr>`;
     });
-    notSubmitted.forEach(h=>{
+    notSubmitted.forEach(s=>{
       html+=`<tr>
-        <td>${h}</td><td>—</td>
+        <td>${s.hrno}</td><td>${s.name||'—'}</td>
         <td class="status-out">未入力</td>
         <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
-        <td><button class="link-btn" onclick="jumpToStudent('${h}')">詳細</button></td>
+        <td><button class="link-btn" onclick="jumpToStudent('${s.hrno}')">詳細</button></td>
       </tr>`;
     });
     html+='</tbody></table></div>';
@@ -318,22 +321,22 @@ async function loadAttendance(){
   const mk=monthKey(attMonth);
   const daysInMonth=new Date(attMonth.getFullYear(),attMonth.getMonth()+1,0).getDate();
   try{
-    const results=await Promise.all(allStudents.map(async h=>{
-      const res=await fetch(GAS_URL+'?pass='+encodeURIComponent(sessionPass)+'&type=student&hrno='+h);
+    const results=await Promise.all(allStudents.map(async s=>{
+      const res=await fetch(GAS_URL+'?pass='+encodeURIComponent(sessionPass)+'&type=student&hrno='+s.hrno);
       const data=await res.json();
-      return {hrno:h,logs:data.logs||[]};
+      return {hrno:s.hrno,name:s.name||'',logs:data.logs||[]};
     }));
-    let html='<table class="attendance-table"><thead><tr><th>HRNO</th>';
+    let html='<table class="attendance-table"><thead><tr><th>HRNO</th><th>氏名</th>';
     for(let d=1;d<=daysInMonth;d++) html+=`<th>${d}</th>`;
     html+='<th>記録日数</th></tr></thead><tbody>';
-    results.forEach(({hrno,logs})=>{
+    results.forEach(({hrno,name,logs})=>{
       const logMap={};
       logs.forEach(l=>{if(l.date.startsWith(mk))logMap[l.date]=l;});
       const days=Object.keys(logMap).filter(k=>{
         const l=logMap[k];
         return l&&l.times.reduce((a,b)=>a+Number(b),0)>0;
       }).length;
-      html+=`<tr><td class="att-hrno">${hrno}</td>`;
+      html+=`<tr><td class="att-hrno">${hrno}</td><td class="att-hrno">${name}</td>`;
       for(let d=1;d<=daysInMonth;d++){
         const k=mk+'-'+pad(d);
         const l=logMap[k];
@@ -383,14 +386,16 @@ function printAttendance(){
   const month=attMonth.getMonth()+1;
   const daysInMonth=new Date(year,attMonth.getMonth()+1,0).getDate();
   const rows=document.querySelectorAll('.attendance-table tbody tr');
-  let tableHtml='<tr><th>HRNO</th>';
+  let tableHtml='<tr><th>HRNO</th><th>氏名</th>';
   for(let d=1;d<=daysInMonth;d++) tableHtml+=`<th>${d}</th>`;
   tableHtml+='</tr>';
   rows.forEach(row=>{
-    const hrno=row.querySelector('.att-hrno').textContent;
-    const cells=row.querySelectorAll('.att-val');
-    tableHtml+=`<tr><td class="hrno-cell">${hrno}</td>`;
-    cells.forEach(cell=>{
+    const cells=row.querySelectorAll('.att-hrno');
+    const hrno=cells[0].textContent;
+    const name=cells[1]?cells[1].textContent:'';
+    const valCells=row.querySelectorAll('.att-val');
+    tableHtml+=`<tr><td class="hrno-cell">${hrno}</td><td class="hrno-cell">${name}</td>`;
+    valCells.forEach(cell=>{
       const mark=cell.textContent;
       const cls=mark==='〇'?'mark-in':mark==='×'?'mark-out':'';
       tableHtml+=`<td class="${cls}">${mark}</td>`;
@@ -404,8 +409,8 @@ function printAttendance(){
 <style>
 @page{size:A4 landscape;margin:8mm;}
 html,body{width:277mm;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-serif;font-size:6px;}
-h2{font-size:8px;margin-bottom:6px;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-serif;font-size:9px;}
+h2{font-size:12px;margin-bottom:6px;}
 table{width:100%;border-collapse:collapse;table-layout:fixed;}
 th,td{border:1px solid #ccc;padding:2px 1px;text-align:center;overflow:hidden;white-space:nowrap;}
 th{background:#f0f0f0;font-weight:600;font-size:8px;}
@@ -433,14 +438,14 @@ async function loadSummary(){
   wrap.innerHTML='<p class="loading">読み込み中…</p>';
   const mk=monthKey(sumMonth);
   try{
-    const results=await Promise.all(allStudents.map(async h=>{
-      const res=await fetch(GAS_URL+'?pass='+encodeURIComponent(sessionPass)+'&type=student&hrno='+h);
+    const results=await Promise.all(allStudents.map(async s=>{
+      const res=await fetch(GAS_URL+'?pass='+encodeURIComponent(sessionPass)+'&type=student&hrno='+s.hrno);
       const data=await res.json();
       const logs=(data.logs||[]).filter(l=>l.date.startsWith(mk));
       const days=logs.length;
-      const total=logs.reduce((s,l)=>s+l.times.reduce((a,b)=>a+Number(b),0),0);
+      const total=logs.reduce((sum,l)=>sum+l.times.reduce((a,b)=>a+Number(b),0),0);
       const lastLog=logs.length>0?logs.sort((a,b)=>b.date.localeCompare(a.date))[0].date:'—';
-      return {hrno:h,days,total,lastLog};
+      return {hrno:s.hrno,name:s.name||'',days,total,lastLog};
     }));
     summaryData=results;
     summarySort={key:'hrno',asc:true};
@@ -468,6 +473,7 @@ function renderSummary(){
   const th=(key,label)=>`<th class="sortable" onclick="sortSummary('${key}')">${label}${summarySort.key===key?`<span class="sort-arrow">${arrow}</span>`:''}</th>`;
   let html='<div style="overflow-x:auto;"><table><thead><tr>'+
     th('hrno','HRNO')+
+    th('name','氏名')+
     th('days','記録日数')+
     th('total','月合計(分)')+
     th('lastLog','最終入力日')+
@@ -477,6 +483,7 @@ function renderSummary(){
     const dayClass=ratio<30?'warn-low':ratio<60?'warn-mid':'';
     html+=`<tr>
       <td>${r.hrno}</td>
+      <td>${r.name}</td>
       <td class="${dayClass}">${r.days}日</td>
       <td>${r.total}分（${(r.total/60).toFixed(1)}h）</td>
       <td>${r.lastLog}</td>
@@ -504,6 +511,7 @@ async function loadStudent(){
     const data=await res.json();
     if(data.error){wrap.innerHTML='<p style="color:#E24B4A;">エラー：'+data.error+'</p>';return;}
     studentLogs={};
+    studentName=data.name||'';
     data.logs.forEach(l=>{studentLogs[l.date]=l;});
     currentMonth=new Date();
     renderStudentDetail(hrno);
@@ -520,6 +528,7 @@ function renderStudentDetail(hrno){
   const grand=totals.reduce((a,b)=>a+b,0);
   const maxT=Math.max(...totals,1);
   let html=`
+    <div class="student-name-header">HRNO: ${hrno}　${studentName}</div>
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem;">
       <button onclick="changeStudentMonth(-1)">◀</button>
       <span style="font-size:14px;font-weight:600;min-width:100px;text-align:center;">${currentMonth.getFullYear()}年${currentMonth.getMonth()+1}月</span>
@@ -527,7 +536,6 @@ function renderStudentDetail(hrno){
     </div>
     <div class="stat-grid">
       <div class="stat-card"><div class="stat-num">${days}</div><div class="stat-lbl">記録日数</div></div>
-      <div class="stat-card"><div class="stat-num">${(grand/60).toFixed(1)}</div><div class="stat-lbl">総学習時間(h)</div></div>
       <div class="stat-card"><div class="stat-num">${days?(grand/days/60).toFixed(1):0}</div><div class="stat-lbl">平均時間/日(h)</div></div>
       <div class="stat-card"><div class="stat-num">${(grand/60).toFixed(1)}</div><div class="stat-lbl">月合計(h)</div></div>
     </div>
