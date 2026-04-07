@@ -160,7 +160,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
   <div class="stat-grid">
     <div class="stat-card"><div class="stat-num" id="s-days">0</div><div class="stat-lbl">記録日数</div></div>
     <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-lbl">総学習時間(h)</div></div>
-    <div class="stat-card"><div class="stat-num" id="s-avg">0</div><div class="stat-lbl">平均時間/日(分)</div></div>
+    <div class="stat-card"><div class="stat-num" id="s-avg">0</div><div class="stat-lbl">平均時間/日(h)</div></div>
   </div>
   <div class="card">
     <p class="card-title">教科別 学習時間（分計）</p>
@@ -544,7 +544,7 @@ function renderStats(){
   const grand=totals.reduce((a,b)=>a+b,0);
   document.getElementById('s-days').textContent=days;
   document.getElementById('s-total').textContent=(grand/60).toFixed(1);
-  document.getElementById('s-avg').textContent=days?Math.round(grand/days):0;
+  document.getElementById('s-avg').textContent=days?(grand/days/60).toFixed(1):0;
   document.getElementById('s-streak').textContent=calcStreak();
   const maxT=Math.max(...totals,1);
   document.getElementById('bar-chart').innerHTML=SUBJECTS.map((s,i)=>`
