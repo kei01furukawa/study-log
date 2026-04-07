@@ -146,6 +146,7 @@ tr:last-child td{border-bottom:none;}
           <span class="toggle-slider"></span>
         </label>
         <span id="att-toggle-label">分で表示中 → 切替で〇×表示</span>
+        <button class="btn-sm" id="print-btn" onclick="printAttendance()" style="margin-left:12px;display:none;">印刷</button>
       </div>
       <div class="month-nav">
         <button onclick="changeAttMonth(-1)">◀</button>
@@ -311,9 +312,9 @@ function changeAttMonth(d){
 async function loadAttendance(){
   const wrap=document.getElementById('attendance-wrap');
   wrap.innerHTML='<p class="loading">読み込み中…</p>';
-  // トグルをリセット
   document.getElementById('att-toggle').checked=false;
   document.getElementById('att-toggle-label').textContent='分で表示中 → 切替で〇×表示';
+  document.getElementById('print-btn').style.display='none';
   const mk=monthKey(attMonth);
   const daysInMonth=new Date(attMonth.getFullYear(),attMonth.getMonth()+1,0).getDate();
   try{
@@ -355,17 +356,67 @@ async function loadAttendance(){
 }
 
 function toggleAttView(){
+  document.getElementById('print-btn').style.display=document.getElementById('att-toggle').checked?'':'none';
   const checked=document.getElementById('att-toggle').checked;
   document.getElementById('att-toggle-label').textContent=checked?'〇×表示中 → 切替で分表示':'分で表示中 → 切替で〇×表示';
   document.querySelectorAll('.att-val').forEach(el=>{
     const orig=el.dataset.orig;
     if(checked){
-if(orig==='—') el.textContent='×';
-      else el.textContent='〇';
+      if(orig==='—'){
+        el.textContent='×';
+        el.className='att-val';
+      } else {
+        el.textContent='〇';
+        el.className='att-cell-in att-val';
+      }
     } else {
       el.textContent=orig;
+      if(orig==='—') el.className='att-cell-out att-val';
+      else if(orig==='0') el.className='att-cell-zero att-val';
+      else el.className='att-cell-in att-val';
     }
   });
+}
+
+function printAttendance(){
+  const year=attMonth.getFullYear();
+  const month=attMonth.getMonth()+1;
+  const daysInMonth=new Date(year,attMonth.getMonth()+1,0).getDate();
+  const rows=document.querySelectorAll('.attendance-table tbody tr');
+  let tableHtml='<tr><th>HRNO</th>';
+  for(let d=1;d<=daysInMonth;d++) tableHtml+=`<th>${d}</th>`;
+  tableHtml+='</tr>';
+  rows.forEach(row=>{
+    const hrno=row.querySelector('.att-hrno').textContent;
+    const cells=row.querySelectorAll('.att-val');
+    tableHtml+=`<tr><td class="hrno-cell">${hrno}</td>`;
+    cells.forEach(cell=>{
+      const mark=cell.textContent;
+      const cls=mark==='〇'?'mark-in':mark==='×'?'mark-out':'';
+      tableHtml+=`<td class="${cls}">${mark}</td>`;
+    });
+    tableHtml+='</tr>';
+  });
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8">
+<title>${year}年${month}月 入力状況</title>
+<style>
+@page{size:A4 landscape;margin:10mm;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-serif;font-size:10px;}
+h2{font-size:14px;margin-bottom:8px;}
+table{width:100%;border-collapse:collapse;table-layout:fixed;}
+th,td{border:1px solid #ccc;padding:3px 2px;text-align:center;overflow:hidden;}
+th{background:#f0f0f0;font-weight:600;}
+.hrno-cell{text-align:left;font-weight:600;font-size:9px;}
+.mark-in{color:#085041;font-weight:600;}
+.mark-out{color:#E24B4A;}
+</style></head><body>
+<h2>浜松南高校　${year}年${month}月　学習記録 入力状況</h2>
+<table><thead>${tableHtml}</thead></table>
+<script>window.onload=function(){window.print();}<\/script>
+</body></html>`);
+  win.document.close();
 }
 
 function updateSumMonthTitle(){
