@@ -402,13 +402,14 @@ function printAttendance(){
 <html lang="ja"><head><meta charset="UTF-8">
 <title>${year}年${month}月 入力状況</title>
 <style>
-@page{size:A4 landscape;margin:10mm;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-serif;font-size:10px;}
-h2{font-size:14px;margin-bottom:8px;}
+@page{size:A4 landscape;margin:8mm;}
+html,body{width:277mm;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-serif;font-size:9px;}
+h2{font-size:12px;margin-bottom:6px;}
 table{width:100%;border-collapse:collapse;table-layout:fixed;}
-th,td{border:1px solid #ccc;padding:3px 2px;text-align:center;overflow:hidden;}
-th{background:#f0f0f0;font-weight:600;}
-.hrno-cell{text-align:left;font-weight:600;font-size:9px;}
+th,td{border:1px solid #ccc;padding:2px 1px;text-align:center;overflow:hidden;white-space:nowrap;}
+th{background:#f0f0f0;font-weight:600;font-size:8px;}
+.hrno-cell{text-align:left;font-weight:600;font-size:8px;width:32px;}
 .mark-in{color:#085041;font-weight:600;}
 .mark-out{color:#E24B4A;}
 </style></head><body>
