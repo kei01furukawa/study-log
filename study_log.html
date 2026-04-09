@@ -19,6 +19,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
   --border:#ddd;--border-sub:#e0e0e0;--input-bg:#fff;
   --streak-num:#1D9E75;--streak-label:#0F6E56;--streak-bg:#f0faf6;
   --tips-bg:#fff8e7;--tips-border:#f0d080;--tips-text:#7a5c00;--tips-label:#b8860b;
+  --cd-bg:#f0f4ff;--cd-border:#c0ccf0;--cd-text:#1a2a6c;--cd-label:#3a4a8c;--cd-num:#1D9E75;
 }
 [data-theme="dark"]{
   --bg:#1a1a1a;--bg-sub:#2a2a2a;--bg-green:#0d2e20;
@@ -26,6 +27,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
   --border:#444;--border-sub:#333;--input-bg:#2a2a2a;
   --streak-num:#4ecb8d;--streak-label:#4ecb8d;--streak-bg:#0d2e20;
   --tips-bg:#2a2510;--tips-border:#7a6020;--tips-text:#e0c060;--tips-label:#f0d070;
+  --cd-bg:#0d1530;--cd-border:#2a3a6c;--cd-text:#a0b0f0;--cd-label:#8090d0;--cd-num:#4ecb8d;
 }
 .app{max-width:480px;margin:0 auto;background:var(--bg);min-height:100vh;padding:1rem;}
 .app-header{font-size:11px;font-weight:600;color:var(--text-sub);letter-spacing:.05em;margin-bottom:10px;}
@@ -79,6 +81,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
 .bar-track{flex:1;height:16px;background:var(--border-sub);border-radius:4px;overflow:hidden;}
 .bar-fill{height:100%;border-radius:4px;transition:width 0.4s;}
 .bar-val{font-size:12px;font-weight:600;width:36px;text-align:right;color:var(--text);}
+.sub-bar-rows{margin-left:50px;margin-bottom:8px;border-left:2px solid var(--border-sub);padding-left:8px;}
+.sub-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.sub-bar-label{font-size:11px;width:42px;color:var(--text-sub);}
+.sub-bar-track{flex:1;height:10px;background:var(--border-sub);border-radius:3px;overflow:hidden;}
+.sub-bar-fill{height:100%;border-radius:3px;}
+.sub-bar-val{font-size:11px;width:36px;text-align:right;color:var(--text-sub);}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
 .stat-card{background:var(--bg-sub);border-radius:10px;padding:10px 12px;text-align:center;}
 .stat-num{font-size:22px;font-weight:600;color:var(--text);}
@@ -86,6 +94,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
 .tips-card{background:var(--tips-bg);border:1px solid var(--tips-border);border-radius:12px;padding:14px 16px;margin-top:12px;}
 .tips-label{font-size:11px;font-weight:600;color:var(--tips-label);letter-spacing:.05em;margin-bottom:6px;}
 .tips-text{font-size:13px;color:var(--tips-text);line-height:1.7;}
+.cd-card{background:var(--cd-bg);border:1px solid var(--cd-border);border-radius:12px;padding:14px 16px;margin-top:12px;text-align:center;}
+.cd-label{font-size:11px;font-weight:600;color:var(--cd-label);letter-spacing:.05em;margin-bottom:10px;}
+.cd-nums{display:flex;justify-content:center;align-items:baseline;gap:4px;}
+.cd-block{display:flex;flex-direction:column;align-items:center;min-width:52px;}
+.cd-num{font-size:28px;font-weight:600;color:var(--cd-num);line-height:1;}
+.cd-unit{font-size:10px;color:var(--cd-label);margin-top:2px;}
+.cd-sep{font-size:24px;font-weight:600;color:var(--cd-label);margin-bottom:12px;}
+.cd-date{font-size:11px;color:var(--cd-label);margin-top:8px;}
 .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center;}
 .week-label{font-size:10px;color:var(--text-sub);padding:2px 0;}
 .day-cell{font-size:11px;padding:5px 2px;border-radius:4px;cursor:pointer;color:var(--text-sub);}
@@ -175,12 +191,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
     <p class="card-title">教科別 学習時間（分計）</p>
     <div id="bar-chart"></div>
   </div>
-  <!-- ★ Tips エリア -->
+  <!-- ★ Tips エリア： -->
   <div class="tips-card">
     <div class="tips-label">Tips</div>
     <div class="tips-text">某県立大学薬学部に合格した先輩は４月は220時間(7.3h/日)勉強していました！</div>
   </div>
   <!-- ★ Tips エリア ここまで -->
+  <div class="cd-card">
+    <div class="cd-label">共通テストまで</div>
+    <div class="cd-nums">
+      <div class="cd-block"><span class="cd-num" id="cd-days">—</span><span class="cd-unit">日</span></div>
+      <span class="cd-sep">:</span>
+      <div class="cd-block"><span class="cd-num" id="cd-hours">—</span><span class="cd-unit">時間</span></div>
+      <span class="cd-sep">:</span>
+      <div class="cd-block"><span class="cd-num" id="cd-mins">—</span><span class="cd-unit">分</span></div>
+      <span class="cd-sep">:</span>
+      <div class="cd-block"><span class="cd-num" id="cd-secs">—</span><span class="cd-unit">秒</span></div>
+    </div>
+    <div class="cd-date">2027年1月16日（土）午前9時30分</div>
+  </div>
 </div>
 
 <div id="calendar" class="section">
@@ -222,21 +251,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
     <span id="profile-status-text">プロフィールが未登録です</span>
   </div>
   <div class="sync-status" id="sync-status">同期：未設定</div>
-
   <p class="section-head" style="margin-top:20px;">表示モード</p>
   <div class="theme-selector">
     <div class="theme-btn" id="theme-light" onclick="setTheme('light')">ライト</div>
     <div class="theme-btn" id="theme-dark" onclick="setTheme('dark')">ダーク</div>
     <div class="theme-btn" id="theme-system" onclick="setTheme('system')">システム</div>
   </div>
-
   <p class="section-head" style="margin-top:24px;">更新履歴</p>
   <table class="history-table">
     <thead><tr><th>Ver.</th><th>日付</th><th>内容</th></tr></thead>
     <tbody>
       <!-- 新しい更新履歴はここに追加してください -->
-      <tr><td>v1.3</td><td>2026-04-09</td><td>国語及び理科で科目別入力欄（任意入力）を追加</td></tr>
-      <tr><td>v1.2</td><td>2026-04-05</td><td>HRNOとパスコードで認証しデータを複数端末で同期可能に</td></tr>
+      <tr><td>v1.2</td><td>2026-04-05</td><td>同期機能を追加、HRNOとパスコードで認証しデータを複数端末で同期可</td></tr>
       <tr><td>v1.1</td><td>2026-04-05</td><td>ダークモード追加・不具合修正およびパフォーマンスの改善</td></tr>
       <tr><td>v1.0</td><td>2025-04-03</td><td>初回リリース</td></tr>
     </tbody>
@@ -249,6 +275,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-
 <script>
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbxF41OQklJVUKf4Im_G1MT857TrBAC3v-ujRdi0jzGjk3pWnRkzviFgtZ2v3KSQl3K5Rg/exec';
 const FB_URL  = 'https://study-log-58f8e-default-rtdb.firebaseio.com/students';
+const COUNTDOWN_TARGET = new Date('2027-01-16T09:30:00+09:00');
 
 const SUBJECTS = [
   {name:'国語',  color:'#D4537E', subs:['現代文','古文','漢文']},
@@ -317,6 +344,29 @@ function initTheme(){
   });
 }
 
+function startCountdown(){
+  function update(){
+    const now=new Date();
+    const diff=COUNTDOWN_TARGET-now;
+    if(diff<=0){
+      document.getElementById('cd-days').textContent='0';
+      document.getElementById('cd-hours').textContent='0';
+      document.getElementById('cd-mins').textContent='0';
+      return;
+    }
+    const days=Math.floor(diff/(1000*60*60*24));
+    const hours=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+    const mins=Math.floor((diff%(1000*60*60))/(1000*60));
+    const secs=Math.floor((diff%(1000*60))/1000);
+    document.getElementById('cd-days').textContent=days;
+    document.getElementById('cd-hours').textContent=pad(hours);
+    document.getElementById('cd-mins').textContent=pad(mins);
+    document.getElementById('cd-secs').textContent=pad(secs);
+  }
+  update();
+  setInterval(update,1000);
+}
+
 function toHankakuInt(str){
   return str.replace(/[０-９]/g,s=>String.fromCharCode(s.charCodeAt(0)-0xFEE0)).replace(/[^0-9]/g,'');
 }
@@ -347,6 +397,17 @@ function sanitizeTimeInput(el){
   const n=parseInt(raw)||0;
   el.classList.toggle('error',raw!==''&&(n<0||n>720));
 }
+
+function updateSubTotal(subjectIdx){
+  const s=SUBJECTS[subjectIdx];
+  if(s.subs.length===0)return;
+  const total=s.subs.reduce((sum,_,j)=>{
+    const el=document.getElementById('t'+subjectIdx+'_'+j);
+    return sum+(parseInt(toHankakuInt(el.value))||0);
+  },0);
+  document.getElementById('t'+subjectIdx).value=total>0?total:'';
+}
+
 function renderProfileStatus(){
   const ok=profile.hrno.length===4&&profile.name.trim()!==''&&profile.bday.length===4;
   const el=document.getElementById('profile-status');
@@ -365,6 +426,10 @@ function toggleDetail(id){
 }
 
 async function init(){
+  // v8→v9マイグレーション
+  if(!localStorage.getItem('study_logs_v9')&&localStorage.getItem('study_logs_v8')){
+    localStorage.setItem('study_logs_v9',localStorage.getItem('study_logs_v8'));
+  }
   const sl=localStorage.getItem('study_logs_v9');
   const sp=localStorage.getItem('study_profile_v8');
   if(sl)logs=JSON.parse(sl);
@@ -398,7 +463,7 @@ async function init(){
         html+=`<div class="sub-row">
           <span class="sub-name">${sub}</span>
           <input type="text" inputmode="numeric" pattern="[0-9]*" class="sub-input" id="t${i}_${j}" placeholder="0"
-            oninput="sanitizeTimeInput(this)" onblur="sanitizeTimeInput(this)">
+            oninput="sanitizeTimeInput(this);updateSubTotal(${i})" onblur="sanitizeTimeInput(this);updateSubTotal(${i})">
           <span class="unit">分</span>
           <span></span>
         </div>`;
@@ -409,6 +474,7 @@ async function init(){
   });
 
   renderProfile();renderProfileStatus();loadDateToForm();renderStats();renderCal();
+  startCountdown();
   await syncFromFirebase();
 }
 
@@ -438,7 +504,7 @@ function loadDateToForm(){
     el.value=l?(l.times[i]||''):'';
     el.classList.remove('error');
     if(s.subs.length>0){
-      s.subs.forEach((sub,j)=>{
+      s.subs.forEach((_,j)=>{
         const sel=document.getElementById('t'+i+'_'+j);
         sel.value=l&&l.subs&&l.subs[i]?(l.subs[i][j]||''):'';
         sel.classList.remove('error');
@@ -463,7 +529,6 @@ async function saveAndSend(){
     if(el.classList.contains('error'))hasError=true;
     return parseInt(el.value)||0;
   });
-  // サブ教科データ収集
   const subs={};
   SUBJECTS.forEach((s,i)=>{
     if(s.subs.length>0){
@@ -545,12 +610,30 @@ function renderStats(){
   document.getElementById('s-avg').textContent=days?(grand/days/60).toFixed(1):0;
   document.getElementById('s-streak').textContent=calcStreak();
   const maxT=Math.max(...totals,1);
-  document.getElementById('bar-chart').innerHTML=SUBJECTS.map((s,i)=>`
-    <div class="bar-row">
+  document.getElementById('bar-chart').innerHTML=SUBJECTS.map((s,i)=>{
+    let html=`<div class="bar-row">
       <span class="bar-label">${s.name}</span>
       <div class="bar-track"><div class="bar-fill" style="width:${Math.round(totals[i]/maxT*100)}%;background:${s.color}"></div></div>
       <span class="bar-val">${totals[i]}</span>
-    </div>`).join('');
+    </div>`;
+    if(s.subs.length>0){
+      const subTotals=s.subs.map((_,j)=>entries.reduce((sum,[,v])=>sum+(v.subs&&v.subs[i]?v.subs[i][j]||0:0),0));
+      const hasSubData=subTotals.some(t=>t>0);
+      if(hasSubData){
+        const maxSub=Math.max(...subTotals,1);
+        html+=`<div class="sub-bar-rows">`;
+        s.subs.forEach((sub,j)=>{
+          html+=`<div class="sub-bar-row">
+            <span class="sub-bar-label">${sub}</span>
+            <div class="sub-bar-track"><div class="sub-bar-fill" style="width:${Math.round(subTotals[j]/maxSub*100)}%;background:${s.color}80"></div></div>
+            <span class="sub-bar-val">${subTotals[j]}</span>
+          </div>`;
+        });
+        html+=`</div>`;
+      }
+    }
+    return html;
+  }).join('');
 }
 
 function renderCal(){
