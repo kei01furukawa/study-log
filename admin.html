@@ -57,7 +57,7 @@ tr:last-child td{border-bottom:none;}
 .att-cell-zero{background:#FCEBEB;color:#E24B4A;font-weight:600;border-radius:4px;}
 .att-cell-out{color:#ddd;}
 .att-hrno{text-align:left;font-weight:600;color:#1a1a1a;white-space:nowrap;padding:4px 10px;}
-.toggle-wrap{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;color:#666;}
+.toggle-wrap{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;color:#666;flex-wrap:wrap;}
 .toggle{position:relative;width:44px;height:24px;cursor:pointer;}
 .toggle input{opacity:0;width:0;height:0;}
 .toggle-slider{position:absolute;inset:0;background:#ddd;border-radius:12px;transition:.2s;}
@@ -147,7 +147,8 @@ tr:last-child td{border-bottom:none;}
           <span class="toggle-slider"></span>
         </label>
         <span id="att-toggle-label">分で表示中 → 切替で〇×表示</span>
-        <button class="btn-sm" id="print-btn" onclick="printAttendance()" style="margin-left:12px;display:none;">印刷</button>
+        <button class="btn-sm" id="csv-btn" onclick="exportCSV()" style="margin-left:4px;display:none;">CSV出力</button>
+        <button class="btn-sm" id="print-btn" onclick="printAttendance()" style="margin-left:4px;display:none;">印刷</button>
       </div>
       <div class="month-nav">
         <button onclick="changeAttMonth(-1)">◀</button>
@@ -211,21 +212,15 @@ async function doLogin(){
     const res=await fetch(GAS_URL+'?pass='+encodeURIComponent(pass)+'&type=students');
     const data=await res.json();
     if(data.error){
-      loginCard.style.opacity='';
-      loginCard.style.pointerEvents='';
-      loginBtn.textContent='ログイン';
-      errEl.textContent='パスワードが正しくありません';
-      return;
+      loginCard.style.opacity='';loginCard.style.pointerEvents='';loginBtn.textContent='ログイン';
+      errEl.textContent='パスワードが正しくありません';return;
     }
-    sessionPass=pass;
-    allStudents=data.students;
+    sessionPass=pass;allStudents=data.students;
     document.getElementById('login-screen').style.display='none';
     document.getElementById('admin-screen').style.display='block';
     initAdmin();
   }catch(e){
-    loginCard.style.opacity='';
-    loginCard.style.pointerEvents='';
-    loginBtn.textContent='ログイン';
+    loginCard.style.opacity='';loginCard.style.pointerEvents='';loginBtn.textContent='ログイン';
     errEl.textContent='接続に失敗しました。しばらくしてから再試行してください。';
   }
 }
@@ -241,16 +236,13 @@ function doLogout(){
 function initAdmin(){
   const yd=new Date();yd.setDate(yd.getDate()-1);
   document.getElementById('date-picker').value=dateStr(yd);
-  attMonth=new Date();
-  sumMonth=new Date();
-  updateAttMonthTitle();
-  updateSumMonthTitle();
+  attMonth=new Date();sumMonth=new Date();
+  updateAttMonthTitle();updateSumMonthTitle();
   const sel=document.getElementById('student-select');
   sel.innerHTML='<option value="">生徒を選択してください</option>';
   allStudents.forEach(s=>{
     const opt=document.createElement('option');
-    opt.value=s.hrno;
-    opt.textContent='HRNO: '+s.hrno+(s.name?' ／ '+s.name:'');
+    opt.value=s.hrno;opt.textContent='HRNO: '+s.hrno+(s.name?' ／ '+s.name:'');
     sel.appendChild(opt);
   });
 }
@@ -266,8 +258,7 @@ async function loadDaily(){
   if(!date){alert('日付を選択してください');return;}
   const wrap=document.getElementById('daily-table-wrap');
   const badges=document.getElementById('daily-badges');
-  wrap.innerHTML='<p class="loading">読み込み中…</p>';
-  badges.innerHTML='';
+  wrap.innerHTML='<p class="loading">読み込み中…</p>';badges.innerHTML='';
   try{
     const res=await fetch(GAS_URL+'?pass='+encodeURIComponent(sessionPass)+'&type=daily&date='+date);
     const data=await res.json();
@@ -299,18 +290,11 @@ async function loadDaily(){
     });
     html+='</tbody></table></div>';
     wrap.innerHTML=html;
-  }catch(e){
-    wrap.innerHTML='<p style="color:#E24B4A;">接続に失敗しました。</p>';
-  }
+  }catch(e){wrap.innerHTML='<p style="color:#E24B4A;">接続に失敗しました。</p>';}
 }
 
-function updateAttMonthTitle(){
-  document.getElementById('att-month-title').textContent=attMonth.getFullYear()+'年'+(attMonth.getMonth()+1)+'月';
-}
-function changeAttMonth(d){
-  attMonth=new Date(attMonth.getFullYear(),attMonth.getMonth()+d,1);
-  updateAttMonthTitle();
-}
+function updateAttMonthTitle(){document.getElementById('att-month-title').textContent=attMonth.getFullYear()+'年'+(attMonth.getMonth()+1)+'月';}
+function changeAttMonth(d){attMonth=new Date(attMonth.getFullYear(),attMonth.getMonth()+d,1);updateAttMonthTitle();}
 
 async function loadAttendance(){
   const wrap=document.getElementById('attendance-wrap');
@@ -318,6 +302,7 @@ async function loadAttendance(){
   document.getElementById('att-toggle').checked=false;
   document.getElementById('att-toggle-label').textContent='分で表示中 → 切替で〇×表示';
   document.getElementById('print-btn').style.display='none';
+  document.getElementById('csv-btn').style.display='none';
   const mk=monthKey(attMonth);
   const daysInMonth=new Date(attMonth.getFullYear(),attMonth.getMonth()+1,0).getDate();
   try{
@@ -333,8 +318,7 @@ async function loadAttendance(){
       const logMap={};
       logs.forEach(l=>{if(l.date.startsWith(mk))logMap[l.date]=l;});
       const days=Object.keys(logMap).filter(k=>{
-        const l=logMap[k];
-        return l&&l.times.reduce((a,b)=>a+Number(b),0)>0;
+        const l=logMap[k];return l&&l.times.reduce((a,b)=>a+Number(b),0)>0;
       }).length;
       html+=`<tr><td class="att-hrno">${hrno}</td><td class="att-hrno">${name}</td>`;
       for(let d=1;d<=daysInMonth;d++){
@@ -343,9 +327,9 @@ async function loadAttendance(){
         const total=l?l.times.reduce((a,b)=>a+Number(b),0):null;
         if(total===null){
           html+=`<td><span class="att-cell-out att-val" data-orig="—">—</span></td>`;
-        } else if(total===0){
+        }else if(total===0){
           html+=`<td><span class="att-cell-zero att-val" data-orig="0">0</span></td>`;
-        } else {
+        }else{
           html+=`<td><span class="att-cell-in att-val" data-orig="${total}">${total}</span></td>`;
         }
       }
@@ -353,32 +337,58 @@ async function loadAttendance(){
     });
     html+='</tbody></table>';
     wrap.innerHTML=html;
-  }catch(e){
-    wrap.innerHTML='<p style="color:#E24B4A;">接続に失敗しました。</p>';
-  }
+    document.getElementById('csv-btn').style.display='inline-block';
+  }catch(e){wrap.innerHTML='<p style="color:#E24B4A;">接続に失敗しました。</p>';}
 }
 
 function toggleAttView(){
-  document.getElementById('print-btn').style.display=document.getElementById('att-toggle').checked?'':'none';
-  const checked=document.getElementById('att-toggle').checked;
-  document.getElementById('att-toggle-label').textContent=checked?'〇×表示中 → 切替で分表示':'分で表示中 → 切替で〇×表示';
+  const isChecked=document.getElementById('att-toggle').checked;
+  document.getElementById('print-btn').style.display=isChecked?'inline-block':'none';
+  document.getElementById('att-toggle-label').textContent=isChecked?'〇×表示中 → 切替で分表示':'分で表示中 → 切替で〇×表示';
   document.querySelectorAll('.att-val').forEach(el=>{
     const orig=el.dataset.orig;
-    if(checked){
-      if(orig==='—'){
-        el.textContent='×';
-        el.className='att-val';
-      } else {
-        el.textContent='〇';
-        el.className='att-cell-in att-val';
-      }
-    } else {
+    if(isChecked){
+      if(orig==='—'){el.textContent='×';el.className='att-val';}
+      else{el.textContent='〇';el.className='att-cell-in att-val';}
+    }else{
       el.textContent=orig;
       if(orig==='—') el.className='att-cell-out att-val';
       else if(orig==='0') el.className='att-cell-zero att-val';
       else el.className='att-cell-in att-val';
     }
   });
+}
+
+function exportCSV(){
+  const year=attMonth.getFullYear();
+  const month=attMonth.getMonth()+1;
+  const daysInMonth=new Date(year,attMonth.getMonth()+1,0).getDate();
+  const rows=document.querySelectorAll('.attendance-table tbody tr');
+  let csv='HRNO,氏名';
+  for(let d=1;d<=daysInMonth;d++) csv+=','+d+'日';
+  csv+=',記録日数\n';
+  rows.forEach(row=>{
+    const hrnoCells=row.querySelectorAll('.att-hrno');
+    const hrno=hrnoCells[0].textContent;
+    const name=hrnoCells[1]?hrnoCells[1].textContent:'';
+    const cells=row.querySelectorAll('.att-val');
+    let line='"'+hrno+'","'+name+'"';
+    let recordDays=0;
+    cells.forEach(cell=>{
+      const orig=cell.dataset.orig;
+      if(orig==='—'){line+=',未入力';}
+      else if(orig==='0'){line+=',0';}
+      else{line+=','+orig;recordDays++;}
+    });
+    line+=','+recordDays;
+    csv+=line+'\n';
+  });
+  const bom='\uFEFF';
+  const blob=new Blob([bom+csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=year+'年'+month+'月_学習記録入力状況.csv';
+  a.click();URL.revokeObjectURL(url);
 }
 
 function printAttendance(){
@@ -425,13 +435,8 @@ th{background:#f0f0f0;font-weight:600;font-size:7px;}
   win.document.close();
 }
 
-function updateSumMonthTitle(){
-  document.getElementById('sum-month-title').textContent=sumMonth.getFullYear()+'年'+(sumMonth.getMonth()+1)+'月';
-}
-function changeSumMonth(d){
-  sumMonth=new Date(sumMonth.getFullYear(),sumMonth.getMonth()+d,1);
-  updateSumMonthTitle();
-}
+function updateSumMonthTitle(){document.getElementById('sum-month-title').textContent=sumMonth.getFullYear()+'年'+(sumMonth.getMonth()+1)+'月';}
+function changeSumMonth(d){sumMonth=new Date(sumMonth.getFullYear(),sumMonth.getMonth()+d,1);updateSumMonthTitle();}
 
 async function loadSummary(){
   const wrap=document.getElementById('summary-wrap');
@@ -444,15 +449,14 @@ async function loadSummary(){
       const logs=(data.logs||[]).filter(l=>l.date.startsWith(mk));
       const days=logs.length;
       const total=logs.reduce((sum,l)=>sum+l.times.reduce((a,b)=>a+Number(b),0),0);
+      const avg=days>0?(total/days/60).toFixed(1):0;
       const lastLog=logs.length>0?logs.sort((a,b)=>b.date.localeCompare(a.date))[0].date:'—';
-      return {hrno:s.hrno,name:s.name||'',days,total,lastLog};
+      return {hrno:s.hrno,name:s.name||'',days,total,avg,lastLog};
     }));
     summaryData=results;
     summarySort={key:'hrno',asc:true};
     renderSummary();
-  }catch(e){
-    wrap.innerHTML='<p style="color:#E24B4A;">接続に失敗しました。</p>';
-  }
+  }catch(e){wrap.innerHTML='<p style="color:#E24B4A;">接続に失敗しました。</p>';}
 }
 
 function sortSummary(key){
@@ -476,6 +480,7 @@ function renderSummary(){
     th('name','氏名')+
     th('days','記録日数')+
     th('total','月合計(分)')+
+    th('avg','平均時間/日(h)')+
     th('lastLog','最終入力日')+
     '<th></th></tr></thead><tbody>';
   sorted.forEach(r=>{
@@ -486,6 +491,7 @@ function renderSummary(){
       <td>${r.name}</td>
       <td class="${dayClass}">${r.days}日</td>
       <td>${r.total}分（${(r.total/60).toFixed(1)}h）</td>
+      <td>${r.avg}h</td>
       <td>${r.lastLog}</td>
       <td><button class="link-btn" onclick="jumpToStudent('${r.hrno}')">詳細</button></td>
     </tr>`;
@@ -497,8 +503,7 @@ function renderSummary(){
 
 function jumpToStudent(hrno){
   document.getElementById('student-select').value=hrno;
-  switchTab('student');
-  loadStudent();
+  switchTab('student');loadStudent();
 }
 
 async function loadStudent(){
@@ -510,14 +515,10 @@ async function loadStudent(){
     const res=await fetch(GAS_URL+'?pass='+encodeURIComponent(sessionPass)+'&type=student&hrno='+hrno);
     const data=await res.json();
     if(data.error){wrap.innerHTML='<p style="color:#E24B4A;">エラー：'+data.error+'</p>';return;}
-    studentLogs={};
-    studentName=data.name||'';
+    studentLogs={};studentName=data.name||'';
     data.logs.forEach(l=>{studentLogs[l.date]=l;});
-    currentMonth=new Date();
-    renderStudentDetail(hrno);
-  }catch(e){
-    wrap.innerHTML='<p style="color:#E24B4A;">接続に失敗しました。</p>';
-  }
+    currentMonth=new Date();renderStudentDetail(hrno);
+  }catch(e){wrap.innerHTML='<p style="color:#E24B4A;">接続に失敗しました。</p>';}
 }
 
 function renderStudentDetail(hrno){
