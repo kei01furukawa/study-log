@@ -578,7 +578,7 @@ function changeStudentMonth(d){
   renderStudentDetail(window._currentHrno);
 }
 
-function buildCardHTML(hrno, name, month, logs){
+function buildCardHTML(hrno,name,month,logs){
   const mk=monthKey(month);
   const entries=Object.entries(logs).filter(([k])=>k.startsWith(mk));
   const days=entries.length;
@@ -588,13 +588,13 @@ function buildCardHTML(hrno, name, month, logs){
   const daysInMonth=new Date(month.getFullYear(),month.getMonth()+1,0).getDate();
   const avg=days?(grand/days/60).toFixed(1):0;
 
-  let barsHtml=SUBJECTS.map((s,i)=>`
-    <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
-      <span style="font-size:10px;width:36px;color:#666;">${s}</span>
-      <div style="flex:1;height:12px;background:#e8e8e8;border-radius:3px;overflow:hidden;">
-        <div style="width:${Math.round(totals[i]/maxT*100)}%;height:100%;background:${SUBJECT_COLORS[i]};border-radius:3px;"></div>
+  const barsHtml=SUBJECTS.map((s,i)=>`
+    <div class="bar-row-p">
+      <span class="bar-label-p">${s}</span>
+      <div class="bar-track-p">
+        <div class="bar-fill-p" style="width:${Math.round(totals[i]/maxT*100)}%;background:${SUBJECT_COLORS[i]};"></div>
       </div>
-      <span style="font-size:10px;width:32px;text-align:right;font-weight:600;">${totals[i]}</span>
+      <span class="bar-val-p">${totals[i]}</span>
     </div>`).join('');
 
   let tableRows='';
@@ -641,7 +641,6 @@ function printStudentCard(){
 async function printAllCards(){
   const btn=document.getElementById('bulk-print-btn');
   btn.textContent='データ取得中…';btn.disabled=true;
-  const mk=monthKey(sumMonth);
   try{
     const results=await Promise.all(allStudents.map(async s=>{
       const res=await fetch(GAS_URL+'?pass='+encodeURIComponent(sessionPass)+'&type=student&hrno='+s.hrno);
@@ -658,32 +657,38 @@ async function printAllCards(){
   }
 }
 
-function openPrintWindow(students, month){
+function openPrintWindow(students,month){
   const cardsHtml=students.map(s=>buildCardHTML(s.hrno,s.name,month,s.logs)).join('');
   const win=window.open('','_blank');
   win.document.write(`<!DOCTYPE html>
 <html lang="ja"><head><meta charset="UTF-8">
 <title>学習記録 個票</title>
 <style>
-@page{size:A4 portrait;margin:8mm;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-serif;margin:0;padding:0;}
-.card-page{width:100%;page-break-after:always;padding:4mm;}
+@page{size:A4 portrait;margin:10mm;}
+*{box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Meiryo',sans-serif;margin:0;padding:0;width:190mm;}
+.card-page{width:190mm;page-break-after:always;padding:0;margin-bottom:0;}
 .card-page:last-child{page-break-after:auto;}
-.card-header{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #1D9E75;padding-bottom:4px;margin-bottom:8px;}
+.card-header{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #1D9E75;padding-bottom:4px;margin-bottom:8px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 .school-name{font-size:10px;color:#888;}
 .card-title-text{font-size:13px;font-weight:600;color:#1a1a1a;}
 .student-info{font-size:11px;font-weight:600;color:#085041;}
 .stats-row{display:flex;gap:8px;margin-bottom:8px;}
-.stat-box{flex:1;background:#f0faf6;border-radius:6px;padding:6px;text-align:center;}
+.stat-box{flex:1;background:#f0faf6;border-radius:6px;padding:6px;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 .stat-n{font-size:18px;font-weight:600;color:#1D9E75;}
 .stat-l{font-size:9px;color:#888;margin-top:1px;}
 .section-title{font-size:10px;font-weight:600;color:#888;letter-spacing:.05em;margin-bottom:4px;}
 .bars{margin-bottom:4px;}
-.detail-table{width:100%;border-collapse:collapse;font-size:9px;}
-.detail-table th{background:#f8f8f8;padding:3px 4px;border:1px solid #ddd;text-align:center;font-weight:600;color:#888;}
-.detail-table td{padding:2px 4px;border:1px solid #eee;text-align:center;}
+.bar-row-p{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.bar-label-p{font-size:10px;width:36px;color:#666;flex-shrink:0;}
+.bar-track-p{flex:1;height:12px;background:#e8e8e8;border-radius:3px;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.bar-fill-p{height:100%;border-radius:3px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.bar-val-p{font-size:10px;width:32px;text-align:right;font-weight:600;flex-shrink:0;}
+.detail-table{width:190mm;border-collapse:collapse;font-size:8px;table-layout:fixed;}
+.detail-table th{background:#f8f8f8;padding:3px 2px;border:1px solid #ddd;text-align:center;font-weight:600;color:#888;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.detail-table td{padding:2px 2px;border:1px solid #eee;text-align:center;overflow:hidden;white-space:nowrap;}
 .detail-table td:first-child{text-align:left;}
-.detail-table td:last-child{text-align:left;max-width:60px;overflow:hidden;}
+.detail-table td:last-child{text-align:left;white-space:normal;word-break:break-all;}
 </style></head><body>
 ${cardsHtml}
 <script>window.onload=function(){window.print();}<\/script>
