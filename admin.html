@@ -173,6 +173,7 @@ tr:last-child td{border-bottom:none;}
         <button onclick="changeSumMonth(1)">▶</button>
         <button class="btn-sm active" onclick="loadSummary()">表示</button>
         <button class="btn-sm" id="bulk-print-btn" onclick="printAllCards()" style="display:none;">全生徒 一括印刷</button>
+        <button class="btn-sm" id="excel-btn" onclick="exportSummaryExcel()" style="display:none;">Excel出力</button>
       </div>
       <div id="summary-wrap">
         <p style="color:#888;font-size:14px;">「表示」を押してください。</p>
@@ -458,6 +459,7 @@ async function loadSummary(){
     summarySort={key:'hrno',asc:true};
     renderSummary();
     document.getElementById('bulk-print-btn').style.display='inline-block';
+    document.getElementById('excel-btn').style.display='inline-block';
   }catch(e){wrap.innerHTML='<p style="color:#E24B4A;">接続に失敗しました。</p>';}
 }
 
@@ -693,6 +695,60 @@ ${cardsHtml}
 <script>window.onload=function(){window.print();}<\/script>
 </body></html>`);
   win.document.close();
+}
+
+async function exportSummaryExcel(){
+  const year=sumMonth.getFullYear();
+  const month=sumMonth.getMonth()+1;
+  const daysInMonth=new Date(year,sumMonth.getMonth()+1,0).getDate();
+
+  // テーブルHTMLを構築
+  let html=`<html xmlns:o="urn:schemas-microsoft-com:office:office"
+    xmlns:x="urn:schemas-microsoft-com:office:excel"
+    xmlns="http://www.w3.org/TR/REC-html40">
+  <head><meta charset="UTF-8">
+  <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets>
+  <x:ExcelWorksheet><x:Name>${year}年${month}月</x:Name>
+  <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
+  </x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+  </head><body><table>`;
+
+  // ヘッダー行
+  html+=`<tr>
+    <th>HRNO</th><th>氏名</th><th>記録日数</th>
+    <th>国語(分)</th><th>数学(分)</th><th>英語(分)</th><th>理科(分)</th><th>社会(分)</th><th>その他(分)</th>
+    <th>月合計(分)</th><th>月合計(h)</th><th>平均時間/日(h)</th><th>最終入力日</th>
+  </tr>`;
+
+  // データ行
+  const mk=monthKey(sumMonth);
+  await Promise.all(summaryData.map(async r=>{
+    const res=await fetch(GAS_URL+'?pass='+encodeURIComponent(sessionPass)+'&type=student&hrno='+r.hrno);
+    const data=await res.json();
+    const logs=(data.logs||[]).filter(l=>l.date.startsWith(mk));
+    const subTotals=SUBJECTS.map((_,i)=>logs.reduce((s,l)=>s+Number(l.times[i]||0),0));
+    html+=`<tr>
+      <td>${r.hrno}</td>
+      <td>${r.name}</td>
+      <td>${r.days}</td>
+      ${subTotals.map(t=>`<td>${t}</td>`).join('')}
+      <td>${r.total}</td>
+      <td>${(r.total/60).toFixed(1)}</td>
+      <td>${r.avg}</td>
+      <td>${r.lastLog}</td>
+    </tr>`;
+  }));
+
+  html+=`</table></body></html>`;
+
+  const bom='\uFEFF';
+  const blob=new Blob([bom+html],{type:'application/vnd.ms-excel;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=year+'年'+month+'月_学習記録サマリー.xls';
+  a.click();
+  URL.revokeObjectURL(url);
 }
 </script>
 </body>
